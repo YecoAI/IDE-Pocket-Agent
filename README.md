@@ -30,7 +30,7 @@ The Agent is written in Python and optimized for Windows systems.
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yecoai/trae-mobile-agent.git
+   git clone https://github.com/YecoAI/TRAE-Mobile-Agent.git
    cd trae-mobile-agent
    ```
 
