@@ -1,0 +1,10 @@
+httpx
+websockets
+mss
+Pillow
+pynput
+pydantic-settings
+pywin32
+customtkinter
+pystray
+darkdetect
