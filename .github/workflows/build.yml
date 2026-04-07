@@ -26,12 +26,11 @@ jobs:
 
       - name: Build macOS App
         run: |
-          pyinstaller --noconfirm --onefile --windowed \
+          pyinstaller --noconfirm --windowed \
             --icon "IDE_Pocket.png" \
             --name "IDE-Pocket-Agent" \
             --add-data "IDE_Pocket.png:." \
             --add-data "src:src" \
-            --add-data "../backend/operator_use:backend/operator_use" \
             --hidden-import="customtkinter" \
             --hidden-import="pystray" \
             --hidden-import="PIL.Image" \
@@ -67,7 +66,7 @@ jobs:
       - name: Build Windows EXE
         run: |
           python convert_icon.py
-          pyinstaller --noconfirm --onefile --windowed --icon "IDE_Pocket.ico" --name "IDE-Pocket-Agent" --version-file "file_version_info.txt" --add-data "IDE_Pocket.png;." --add-data "src;src" --add-data "..\backend\operator_use;backend\operator_use" --hidden-import="customtkinter" --hidden-import="pystray" --hidden-import="PIL.Image" --hidden-import="pynput.mouse" --hidden-import="pynput.keyboard" --hidden-import="mss" --hidden-import="win32crypt" --hidden-import="win32gui" --hidden-import="win32api" --hidden-import="win32con" --hidden-import="comtypes" --hidden-import="comtypes.client" --hidden-import="comtypes.stream" main.py
+          pyinstaller --noconfirm --onefile --windowed --icon "IDE_Pocket.ico" --name "IDE-Pocket-Agent" --version-file "file_version_info.txt" --add-data "IDE_Pocket.png;." --add-data "src;src" --hidden-import="customtkinter" --hidden-import="pystray" --hidden-import="PIL.Image" --hidden-import="pynput.mouse" --hidden-import="pynput.keyboard" --hidden-import="mss" --hidden-import="win32crypt" --hidden-import="win32gui" --hidden-import="win32api" --hidden-import="win32con" --hidden-import="comtypes" --hidden-import="comtypes.client" --hidden-import="comtypes.stream" main.py
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4

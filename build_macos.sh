@@ -29,12 +29,11 @@ rm -rf build dist IDE-Pocket-Agent.spec
 
 # 5. Build with PyInstaller
 echo "🛠️ Building .app bundle..."
-pyinstaller --noconfirm --onefile --windowed \
+pyinstaller --noconfirm --windowed \
     --icon "IDE_Pocket.png" \
     --name "IDE-Pocket-Agent" \
     --add-data "IDE_Pocket.png:." \
     --add-data "src:src" \
-    --add-data "../backend/operator_use:backend/operator_use" \
     --hidden-import="customtkinter" \
     --hidden-import="pystray" \
     --hidden-import="PIL.Image" \

@@ -65,7 +65,7 @@ pip install pyinstaller
 python convert_icon.py
 
 # Build the executable
-pyinstaller --noconfirm --onefile --windowed --icon "IDE_Pocket.ico" --name "IDE-Pocket-Agent" --version-file "file_version_info.txt" --add-data "IDE_Pocket.png;." --add-data "src;src" --add-data "..\backend\operator_use;backend\operator_use" --hidden-import="customtkinter" --hidden-import="pystray" --hidden-import="PIL.Image" --hidden-import="pynput.mouse" --hidden-import="pynput.keyboard" --hidden-import="mss" --hidden-import="win32crypt" --hidden-import="win32gui" --hidden-import="win32api" --hidden-import="win32con" --hidden-import="comtypes" --hidden-import="comtypes.client" --hidden-import="comtypes.stream" main.py
+pyinstaller --noconfirm --onefile --windowed --icon "IDE_Pocket.ico" --name "IDE-Pocket-Agent" --version-file "file_version_info.txt" --add-data "IDE_Pocket.png;." --add-data "src;src" --hidden-import="customtkinter" --hidden-import="pystray" --hidden-import="PIL.Image" --hidden-import="pynput.mouse" --hidden-import="pynput.keyboard" --hidden-import="mss" --hidden-import="win32crypt" --hidden-import="win32gui" --hidden-import="win32api" --hidden-import="win32con" --hidden-import="comtypes" --hidden-import="comtypes.client" --hidden-import="comtypes.stream" main.py
 ```
 
 #### macOS
@@ -86,7 +86,7 @@ Alternatively, you can run the command manually:
 pip install pyinstaller
 
 # Build the .app bundle
-pyinstaller --noconfirm --onefile --windowed --icon "IDE_Pocket.png" --name "IDE-Pocket-Agent" --add-data "IDE_Pocket.png:." --add-data "src:src" --add-data "../backend/operator_use:backend/operator_use" --hidden-import="customtkinter" --hidden-import="pystray" --hidden-import="PIL.Image" --hidden-import="pynput.mouse" --hidden-import="pynput.keyboard" --hidden-import="mss" --hidden-import="keyring" main.py
+pyinstaller --noconfirm --windowed --icon "IDE_Pocket.png" --name "IDE-Pocket-Agent" --add-data "IDE_Pocket.png:." --add-data "src:src" --hidden-import="customtkinter" --hidden-import="pystray" --hidden-import="PIL.Image" --hidden-import="pynput.mouse" --hidden-import="pynput.keyboard" --hidden-import="mss" --hidden-import="keyring" main.py
 ```
 
 Note: On macOS, the application will use the System Keychain to securely store your credentials.
