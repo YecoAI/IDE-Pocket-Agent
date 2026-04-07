@@ -4,8 +4,8 @@ mss
 Pillow
 pynput
 pydantic-settings
-pywin32
 customtkinter
 pystray
 darkdetect
 keyring
+pywin32; sys_platform == 'win32'
