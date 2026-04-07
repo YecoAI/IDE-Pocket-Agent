@@ -73,3 +73,38 @@ jobs:
         with:
           name: IDE-Pocket-Agent-Windows
           path: dist/IDE-Pocket-Agent.exe
+
+  create-release:
+    needs: [build-macos, build-windows]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Windows Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: IDE-Pocket-Agent-Windows
+          path: release-assets
+
+      - name: Download macOS Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: IDE-Pocket-Agent-macOS
+          path: release-assets/IDE-Pocket-Agent.app
+
+      - name: Zip macOS App
+        run: |
+          cd release-assets
+          zip -r IDE-Pocket-Agent-macOS.zip IDE-Pocket-Agent.app
+          rm -rf IDE-Pocket-Agent.app
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release-assets/IDE-Pocket-Agent.exe
+            release-assets/IDE-Pocket-Agent-macOS.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
