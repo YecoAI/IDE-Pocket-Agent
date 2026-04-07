@@ -46,47 +46,13 @@ jobs:
           name: IDE-Pocket-Agent-macOS
           path: dist/IDE-Pocket-Agent.app
 
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller
-
-      - name: Build Windows EXE
-        run: |
-          python convert_icon.py
-          pyinstaller --noconfirm --onefile --windowed --icon "IDE_Pocket.ico" --name "IDE-Pocket-Agent" --version-file "file_version_info.txt" --add-data "IDE_Pocket.png;." --add-data "src;src" --hidden-import="customtkinter" --hidden-import="pystray" --hidden-import="PIL.Image" --hidden-import="pynput.mouse" --hidden-import="pynput.keyboard" --hidden-import="mss" --hidden-import="win32crypt" --hidden-import="win32gui" --hidden-import="win32api" --hidden-import="win32con" --hidden-import="comtypes" --hidden-import="comtypes.client" --hidden-import="comtypes.stream" main.py
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: IDE-Pocket-Agent-Windows
-          path: dist/IDE-Pocket-Agent.exe
-
   create-release:
-    needs: [build-macos, build-windows]
+    needs: [build-macos]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Download Windows Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: IDE-Pocket-Agent-Windows
-          path: release-assets
-
       - name: Download macOS Artifact
         uses: actions/download-artifact@v4
         with:
@@ -103,7 +69,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            release-assets/IDE-Pocket-Agent.exe
             release-assets/IDE-Pocket-Agent-macOS.zip
           draft: false
           prerelease: false
