@@ -18,16 +18,16 @@ def setup_sys_path():
     if getattr(sys, 'frozen', False):
         base_path = sys._MEIPASS
         sys.path.insert(0, base_path)
-        # Search in src/backend (for the new structure) and backend (for compatibility)
+                                                                                       
         sys.path.insert(0, os.path.join(base_path, 'src', 'backend'))
         sys.path.insert(0, os.path.join(base_path, 'backend'))
     else:
-        # Development mode
+                          
         current_dir = os.path.dirname(os.path.abspath(__file__))
         project_root = os.path.dirname(current_dir)
-        # Local src/backend
+                           
         sys.path.insert(0, os.path.join(current_dir))
-        # External backend (for legacy)
+                                       
         sys.path.insert(0, os.path.abspath(os.path.join(project_root, '..')))
         sys.path.insert(0, os.path.abspath(os.path.join(project_root, '..', 'backend')))
 

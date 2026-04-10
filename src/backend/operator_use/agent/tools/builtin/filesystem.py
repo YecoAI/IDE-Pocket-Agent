@@ -84,7 +84,7 @@ class EditFile(BaseModel):
 
 @Tool(name="edit_file",description="Edit a file by replacing exact chunks of text. Pass one or more {old_content, new_content} pairs — applied in order on a single read/write. Set new_content to empty string to delete a chunk. Always read the file first to get the exact text. Use write_file for full rewrites.",model=EditFile)
 async def edit_file(path: str, edits: list[dict], **kwargs) -> ToolResult:
-    # Coerce edits if the LLM passed a JSON-encoded string instead of a list
+                                                                            
     if isinstance(edits, str):
         try:
             edits = json.loads(edits)

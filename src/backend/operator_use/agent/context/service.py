@@ -13,9 +13,9 @@ BOOTSTRAP_FILENAMES = ["RULES.md", "SOUL.md", "USER.md", "CODE.md", "AGENTS.md"]
 
 
 class PromptMode(str, Enum):
-    FULL    = "full"     # Main agent: full prompt with memory, bootstrap files, respond rules
-    MINIMAL = "minimal"  # Delegated agent: identity + skills only, no memory/user/soul files
-    NONE    = "none"     # Raw subagent: single-line identity only
+    FULL    = "full"                                                                          
+    MINIMAL = "minimal"                                                                      
+    NONE    = "none"                                              
 
 
 class Context:
@@ -208,7 +208,7 @@ You are a helpful personal assistant.
         older images are replaced with a lightweight HumanMessage referencing the file paths,
         avoiding repeated large base64 payloads on every subsequent LLM call.
         """
-        # Find index of the last ImageMessage so we keep its pixel data intact
+                                                                              
         last_image_idx = -1
         for i, msg in enumerate(history):
             if isinstance(msg, ImageMessage):
@@ -216,7 +216,7 @@ You are a helpful personal assistant.
 
         hydrated = []
         for i, msg in enumerate(history):
-            # Downgrade old ImageMessages to plain text references
+                                                                  
             if isinstance(msg, ImageMessage) and i != last_image_idx:
                 paths = msg.metadata.get("image_paths") or []
                 if paths:

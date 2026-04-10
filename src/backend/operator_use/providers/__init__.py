@@ -6,17 +6,17 @@ Shared base protocols and data models:
     - ``TokenUsage``, ``Metadata`` — LLM data models
 """
 
-# Base protocols & data models
+                              
 from operator_use.providers.base import BaseChatLLM
 from operator_use.providers.views import TokenUsage, Metadata
 from operator_use.providers.events import Thinking, LLMEvent, LLMStreamEvent, ToolCall
 
-# LLM providers
+               
 from operator_use.providers.openai import ChatOpenAI
 from operator_use.providers.zai import ChatZAI
 
 __all__ = [
-    # Base
+          
     "BaseChatLLM",
     "TokenUsage",
     "Metadata",
@@ -24,7 +24,7 @@ __all__ = [
     "LLMEvent",
     "LLMStreamEvent",
     "ToolCall",
-    # LLM providers
+                   
     "ChatOpenAI",
     "ChatZAI",
 ]

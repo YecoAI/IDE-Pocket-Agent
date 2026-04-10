@@ -23,9 +23,9 @@ if TYPE_CHECKING:
     from .controls import Control
 
 
-METRO_WINDOW_CLASS_NAME = 'Windows.UI.Core.CoreWindow'  # for Windows 8 and 8.1
-SEARCH_INTERVAL = 0.5  # search control interval seconds
-MAX_MOVE_SECOND = 1  # simulate mouse move or drag max seconds
+METRO_WINDOW_CLASS_NAME = 'Windows.UI.Core.CoreWindow'                         
+SEARCH_INTERVAL = 0.5                                   
+MAX_MOVE_SECOND = 1                                           
 TIME_OUT_SECOND = 10
 OPERATION_WAIT_TIME = 0.5
 MAX_PATH = 260
@@ -36,8 +36,8 @@ S_OK = 0
 IsPy38OrHigher = sys.version_info[:2] >= (3, 8)
 IsNT6orHigher = os.sys.getwindowsversion().major >= 6
 CurrentProcessIs64Bit = sys.maxsize > 0xFFFFFFFF
-ProcessTime = time.perf_counter  # this returns nearly 0 when first call it if python version <= 3.6
-ProcessTime()  # need to call it once if python version <= 3.6
+ProcessTime = time.perf_counter                                                                     
+ProcessTime()                                                 
 TreeNode = Any
 
 
@@ -53,11 +53,11 @@ def GetPatternIdInterface(patternId: int):
     global _PatternIdInterfaces
     if not _PatternIdInterfaces:
         _PatternIdInterfaces = {
-            # PatternId.AnnotationPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationAnnotationPattern,
-            # PatternId.CustomNavigationPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationCustomNavigationPattern,
+                                                                                                                        
+                                                                                                                                    
             PatternId.DockPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationDockPattern,
-            # PatternId.DragPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationDragPattern,
-            # PatternId.DropTargetPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationDropTargetPattern,
+                                                                                                            
+                                                                                                                        
             PatternId.ExpandCollapsePattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationExpandCollapsePattern,
             PatternId.GridItemPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationGridItemPattern,
             PatternId.GridPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationGridPattern,
@@ -65,31 +65,31 @@ def GetPatternIdInterface(patternId: int):
             PatternId.ItemContainerPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationItemContainerPattern,
             PatternId.LegacyIAccessiblePattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationLegacyIAccessiblePattern,
             PatternId.MultipleViewPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationMultipleViewPattern,
-            # PatternId.ObjectModelPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationObjectModelPattern,
+                                                                                                                          
             PatternId.RangeValuePattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationRangeValuePattern,
             PatternId.ScrollItemPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationScrollItemPattern,
             PatternId.ScrollPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationScrollPattern,
             PatternId.SelectionItemPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationSelectionItemPattern,
             PatternId.SelectionPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationSelectionPattern,
-            # PatternId.SpreadsheetItemPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationSpreadsheetItemPattern,
-            # PatternId.SpreadsheetPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationSpreadsheetPattern,
-            # PatternId.StylesPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationStylesPattern,
+                                                                                                                                  
+                                                                                                                          
+                                                                                                                
             PatternId.SynchronizedInputPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationSynchronizedInputPattern,
             PatternId.TableItemPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationTableItemPattern,
             PatternId.TablePattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationTablePattern,
-            # PatternId.TextChildPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationTextChildPattern,
-            # PatternId.TextEditPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationTextEditPattern,
+                                                                                                                      
+                                                                                                                    
             PatternId.TextPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationTextPattern,
-            # PatternId.TextPattern2: _AutomationClient.instance().UIAutomationCore.IUIAutomationTextPattern2,
+                                                                                                              
             PatternId.TogglePattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationTogglePattern,
             PatternId.TransformPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationTransformPattern,
-            # PatternId.TransformPattern2: _AutomationClient.instance().UIAutomationCore.IUIAutomationTransformPattern2,
+                                                                                                                        
             PatternId.ValuePattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationValuePattern,
             PatternId.VirtualizedItemPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationVirtualizedItemPattern,
             PatternId.WindowPattern: _AutomationClient.instance().UIAutomationCore.IUIAutomationWindowPattern,
         }
         debug = False
-        # the following patterns doesn't exist on Windows 7 or lower
+                                                                    
         try:
             _PatternIdInterfaces[PatternId.AnnotationPattern] = _AutomationClient.instance().UIAutomationCore.IUIAutomationAnnotationPattern
         except:
@@ -569,7 +569,7 @@ class LegacyIAccessiblePattern():
         Return str, the Microsoft Active Accessibility name property of the element.
         Refer https://docs.microsoft.com/en-us/windows/win32/api/uiautomationclient/nf-uiautomationclient-iuiautomationlegacyiaccessiblepattern-get_currentname
         """
-        return self.pattern.CurrentName or ''    # CurrentName may be None
+        return self.pattern.CurrentName or ''                             
 
     @property
     def Role(self) -> int:
@@ -715,13 +715,13 @@ class ObjectModelPattern():
         """Refer https://docs.microsoft.com/en-us/windows/win32/api/uiautomationclient/nn-uiautomationclient-iuiautomationobjectmodelpattern"""
         self.pattern = pattern
 
-    # def GetUnderlyingObjectModel(self) -> ctypes.POINTER(comtypes.automation.IUnknown):
-    #     """
-    #     Call IUIAutomationObjectModelPattern::GetUnderlyingObjectModel, todo.
-    #     Return `ctypes.POINTER(comtypes.IUnknown)`, an interface used to access the underlying object model of the provider.
-    #     Refer https://docs.microsoft.com/en-us/windows/win32/api/uiautomationclient/nf-uiautomationclient-iuiautomationobjectmodelpattern-getunderlyingobjectmodel
-    #     """
-    #     return self.pattern.GetUnderlyingObjectModel()
+                                                                                         
+             
+                                                                               
+                                                                                                                              
+                                                                                                                                                                    
+             
+                                                        
 
 
 class RangeValuePattern():

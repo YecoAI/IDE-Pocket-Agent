@@ -40,18 +40,18 @@ def move_window_to_desktop(hwnd: int, desktop_id: str):
     _get_manager().move_window_to_desktop(hwnd, desktop_id)
 
 
-# =============================================================================
-# Standard COM CLSIDs (stable across all Windows versions)
-# =============================================================================
+                                                                               
+                                                          
+                                                                               
 
 CLSID_VirtualDesktopManager = GUID("{aa509086-5ca9-4c25-8f95-589d3c07b48a}")
 CLSID_ImmersiveShell = GUID("{C2F03A33-21F5-47FA-B4BB-156362A2F239}")
 CLSID_VirtualDesktopManagerInternal = GUID("{C5E0CDCA-7B6E-41B2-9FC4-D93975CC467B}")
 IID_IServiceProvider = GUID("{6D5140C1-7436-11CE-8034-00AA006009FA}")
 
-# =============================================================================
-# Public IVirtualDesktopManager (documented, stable across all versions)
-# =============================================================================
+                                                                               
+                                                                        
+                                                                               
 
 
 class IVirtualDesktopManager(IUnknown):
@@ -115,9 +115,9 @@ class IObjectArray(IUnknown):
     ]
 
 
-# =============================================================================
-# HSTRING utilities for WinRT string operations
-# =============================================================================
+                                                                               
+                                               
+                                                                               
 
 
 class HSTRING(c_void_p):
@@ -154,12 +154,12 @@ def delete_hstring(hs: HSTRING):
         _WindowsDeleteString(hs)
 
 
-# =============================================================================
-# Build detection
-#
-# The internal COM GUIDs change not just between major builds but also between
-# revision numbers (UBR). We need both BUILD and UBR for precise matching.
-# =============================================================================
+                                                                               
+                 
+ 
+                                                                              
+                                                                          
+                                                                               
 
 BUILD = sys.getwindowsversion().build
 
@@ -185,29 +185,29 @@ _BUILD_TUPLE = (BUILD, UBR)
 
 logger.debug(f"[VDM] Windows Build: {BUILD}.{UBR}")
 
-# =============================================================================
-# Version group determination
-#
-# The undocumented internal COM interface GUIDs and vtable layouts change
-# between builds. We group builds by their interface characteristics.
-#
-# Reference: https://github.com/FuPeiJiang/Windows-BuildNumber-VirtualDesktop
-#
-# Groups:
-#   WIN10        - Build < 22000 (Windows 10 / Server 2022)
-#                  No HMONITOR params, no SetName, no MoveDesktop
-#   WIN11_21H2   - 22000 <= Build < 22483
-#                  HMONITOR params, has SetName
-#   WIN11_22H2_E - 22483 <= Build(,UBR) < (22621,2215)
-#                  HMONITOR params, has SetName, GetAllCurrentDesktops added
-#   WIN11_22H2_L - (22621,2215) <= Build(,UBR) < (22631,3085)
-#                  No HMONITOR params, has SetName (new GUIDs)
-#   WIN11_23H2   - (22631,3085) <= Build < 26100
-#                  No HMONITOR params, has SetName (new GUIDs again)
-#   WIN11_24H2   - Build >= 26100
-#                  No HMONITOR params, has SetName,
-#                  SwitchDesktopAndMoveForegroundView added
-# =============================================================================
+                                                                               
+                             
+ 
+                                                                         
+                                                                     
+ 
+                                                                             
+ 
+         
+                                                           
+                                                                 
+                                         
+                                               
+                                                      
+                                                                            
+                                                             
+                                                              
+                                                
+                                                                    
+                                 
+                                                   
+                                                           
+                                                                               
 
 if BUILD >= 26100:
     _VER = "WIN11_24H2"
@@ -224,15 +224,15 @@ else:
 
 logger.debug(f"[VDM] Version group: {_VER}")
 
-# Whether methods on the internal manager require an HMONITOR parameter
+                                                                       
 _USES_HMONITOR = _VER in ("WIN11_21H2", "WIN11_22H2_E")
 
-# Whether SetName (rename desktop) is supported
+                                               
 _HAS_SET_NAME = _VER != "WIN10"
 
-# =============================================================================
-# Interface IIDs based on version group
-# =============================================================================
+                                                                               
+                                       
+                                                                               
 
 _IID_MAP = {
     "WIN10": {
@@ -244,7 +244,7 @@ _IID_MAP = {
         "Desktop": GUID("{536D3495-B208-4CC9-AE26-DE8111275BF8}"),
     },
     "WIN11_22H2_E": {
-        # Same GUIDs as 21H2 but different vtable layout
+                                                        
         "ManagerInternal": GUID("{B2F925B9-5A0F-4D2E-9F4D-2B1507593C10}"),
         "Desktop": GUID("{536D3495-B208-4CC9-AE26-DE8111275BF8}"),
     },
@@ -257,7 +257,7 @@ _IID_MAP = {
         "Desktop": GUID("{3F07F4BE-B107-441A-AF0F-39D82529072C}"),
     },
     "WIN11_24H2": {
-        # Uses IVirtualDesktopManagerInternal2 IID on this build
+                                                                
         "ManagerInternal": GUID("{53F5CA0B-158F-4124-900C-057158060B27}"),
         "Desktop": GUID("{3F07F4BE-B107-441A-AF0F-39D82529072C}"),
     },
@@ -266,13 +266,13 @@ _IID_MAP = {
 IID_IVirtualDesktopManagerInternal = _IID_MAP[_VER]["ManagerInternal"]
 IID_IVirtualDesktop = _IID_MAP[_VER]["Desktop"]
 
-# =============================================================================
-# IVirtualDesktop interface
-#
-# Only GetID() is used by the VirtualDesktopManager wrapper.
-# GetID is always at vtable index 4 (slot 1 after IUnknown) in ALL versions,
-# so we use a minimal 2-method definition that works across all builds.
-# =============================================================================
+                                                                               
+                           
+ 
+                                                            
+                                                                            
+                                                                       
+                                                                               
 
 
 class IVirtualDesktop(IUnknown):
@@ -283,22 +283,22 @@ class IVirtualDesktop(IUnknown):
     ]
 
 
-# Placeholder for IApplicationView (used in method signatures but never called)
+                                                                               
 class IApplicationView(IUnknown):
     _iid_ = GUID("{372E1D3B-38D3-42E4-A15B-8AB2B178F513}")
 
 
-# =============================================================================
-# IVirtualDesktopManagerInternal interface
-#
-# The vtable layout changes significantly between Windows builds.
-# Key differences:
-#   - Win10: No HMONITOR params, no MoveDesktop, no SetName
-#   - Win11 21H2: HMONITOR params on GetCount/GetCurrent/GetDesktops/Switch/Create
-#   - Win11 22H2 early: Same as 21H2 + GetAllCurrentDesktops inserted at idx 7
-#   - Win11 22H2 late / 23H2: HMONITOR params removed
-#   - Win11 24H2: SwitchDesktopAndMoveForegroundView added at idx 10
-# =============================================================================
+                                                                               
+                                          
+ 
+                                                                 
+                  
+                                                           
+                                                                                  
+                                                                              
+                                                     
+                                                                    
+                                                                               
 
 
 class IVirtualDesktopManagerInternal(IUnknown):
@@ -306,50 +306,50 @@ class IVirtualDesktopManagerInternal(IUnknown):
 
     if _VER == "WIN10":
         _methods_ = [
-            # 3: GetCount()
+                           
             COMMETHOD([], HRESULT, "GetCount", (["out"], POINTER(UINT), "pCount")),
-            # 4: MoveViewToDesktop
+                                  
             STDMETHOD(
                 HRESULT,
                 "MoveViewToDesktop",
                 (POINTER(IApplicationView), POINTER(IVirtualDesktop)),
             ),
-            # 5: CanViewMoveDesktops
+                                    
             STDMETHOD(
                 HRESULT,
                 "CanViewMoveDesktops",
                 (POINTER(IApplicationView), POINTER(UINT)),
             ),
-            # 6: GetCurrentDesktop
+                                  
             COMMETHOD(
                 [],
                 HRESULT,
                 "GetCurrentDesktop",
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # 7: GetDesktops
+                            
             COMMETHOD(
                 [],
                 HRESULT,
                 "GetDesktops",
                 (["out"], POINTER(POINTER(IObjectArray)), "array"),
             ),
-            # 8: GetAdjacentDesktop
+                                   
             STDMETHOD(
                 HRESULT,
                 "GetAdjacentDesktop",
                 (POINTER(IVirtualDesktop), UINT, POINTER(POINTER(IVirtualDesktop))),
             ),
-            # 9: SwitchDesktop
+                              
             STDMETHOD(HRESULT, "SwitchDesktop", (POINTER(IVirtualDesktop),)),
-            # 10: CreateDesktopW
+                                
             COMMETHOD(
                 [],
                 HRESULT,
                 "CreateDesktopW",
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # 11: RemoveDesktop
+                               
             COMMETHOD(
                 [],
                 HRESULT,
@@ -357,7 +357,7 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], POINTER(IVirtualDesktop), "destroyDesktop"),
                 (["in"], POINTER(IVirtualDesktop), "fallbackDesktop"),
             ),
-            # 12: FindDesktop
+                             
             COMMETHOD(
                 [],
                 HRESULT,
@@ -365,12 +365,12 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], POINTER(GUID), "pGuid"),
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # No SetName on Windows 10
+                                      
         ]
 
     elif _VER == "WIN11_21H2":
         _methods_ = [
-            # 3: GetCount(hMon)
+                               
             COMMETHOD(
                 [],
                 HRESULT,
@@ -378,19 +378,19 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], HWND, "hMon"),
                 (["out"], POINTER(UINT), "pCount"),
             ),
-            # 4: MoveViewToDesktop
+                                  
             STDMETHOD(
                 HRESULT,
                 "MoveViewToDesktop",
                 (POINTER(IApplicationView), POINTER(IVirtualDesktop)),
             ),
-            # 5: CanViewMoveDesktops
+                                    
             STDMETHOD(
                 HRESULT,
                 "CanViewMoveDesktops",
                 (POINTER(IApplicationView), POINTER(UINT)),
             ),
-            # 6: GetCurrentDesktop(hMon)
+                                        
             COMMETHOD(
                 [],
                 HRESULT,
@@ -398,7 +398,7 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], HWND, "hMon"),
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # 7: GetDesktops(hMon)
+                                  
             COMMETHOD(
                 [],
                 HRESULT,
@@ -406,15 +406,15 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], HWND, "hMon"),
                 (["out"], POINTER(POINTER(IObjectArray)), "array"),
             ),
-            # 8: GetAdjacentDesktop
+                                   
             STDMETHOD(
                 HRESULT,
                 "GetAdjacentDesktop",
                 (POINTER(IVirtualDesktop), UINT, POINTER(POINTER(IVirtualDesktop))),
             ),
-            # 9: SwitchDesktop(hMon, desktop)
+                                             
             STDMETHOD(HRESULT, "SwitchDesktop", (HWND, POINTER(IVirtualDesktop))),
-            # 10: CreateDesktopW(hMon)
+                                      
             COMMETHOD(
                 [],
                 HRESULT,
@@ -422,11 +422,11 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], HWND, "hMon"),
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # 11: MoveDesktop(desktop, hMon, index)
+                                                   
             STDMETHOD(
                 HRESULT, "MoveDesktop", (POINTER(IVirtualDesktop), HWND, UINT)
             ),
-            # 12: RemoveDesktop
+                               
             COMMETHOD(
                 [],
                 HRESULT,
@@ -434,7 +434,7 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], POINTER(IVirtualDesktop), "destroyDesktop"),
                 (["in"], POINTER(IVirtualDesktop), "fallbackDesktop"),
             ),
-            # 13: FindDesktop
+                             
             COMMETHOD(
                 [],
                 HRESULT,
@@ -442,7 +442,7 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], POINTER(GUID), "pGuid"),
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # 14: GetDesktopSwitchIncludeExcludeViews
+                                                     
             STDMETHOD(
                 HRESULT,
                 "GetDesktopSwitchIncludeExcludeViews",
@@ -452,7 +452,7 @@ class IVirtualDesktopManagerInternal(IUnknown):
                     POINTER(POINTER(IObjectArray)),
                 ),
             ),
-            # 15: SetName
+                         
             COMMETHOD(
                 [],
                 HRESULT,
@@ -463,10 +463,10 @@ class IVirtualDesktopManagerInternal(IUnknown):
         ]
 
     elif _VER == "WIN11_22H2_E":
-        # Same GUIDs as 21H2 but GetAllCurrentDesktops is inserted at index 7,
-        # shifting GetDesktops and subsequent methods by one slot.
+                                                                              
+                                                                  
         _methods_ = [
-            # 3: GetCount(hMon)
+                               
             COMMETHOD(
                 [],
                 HRESULT,
@@ -474,19 +474,19 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], HWND, "hMon"),
                 (["out"], POINTER(UINT), "pCount"),
             ),
-            # 4: MoveViewToDesktop
+                                  
             STDMETHOD(
                 HRESULT,
                 "MoveViewToDesktop",
                 (POINTER(IApplicationView), POINTER(IVirtualDesktop)),
             ),
-            # 5: CanViewMoveDesktops
+                                    
             STDMETHOD(
                 HRESULT,
                 "CanViewMoveDesktops",
                 (POINTER(IApplicationView), POINTER(UINT)),
             ),
-            # 6: GetCurrentDesktop(hMon)
+                                        
             COMMETHOD(
                 [],
                 HRESULT,
@@ -494,14 +494,14 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], HWND, "hMon"),
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # 7: GetAllCurrentDesktops (NEW in 22483)
+                                                     
             COMMETHOD(
                 [],
                 HRESULT,
                 "GetAllCurrentDesktops",
                 (["out"], POINTER(POINTER(IObjectArray)), "array"),
             ),
-            # 8: GetDesktops(hMon) - SHIFTED from idx 7
+                                                       
             COMMETHOD(
                 [],
                 HRESULT,
@@ -509,15 +509,15 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], HWND, "hMon"),
                 (["out"], POINTER(POINTER(IObjectArray)), "array"),
             ),
-            # 9: GetAdjacentDesktop
+                                   
             STDMETHOD(
                 HRESULT,
                 "GetAdjacentDesktop",
                 (POINTER(IVirtualDesktop), UINT, POINTER(POINTER(IVirtualDesktop))),
             ),
-            # 10: SwitchDesktop(hMon, desktop)
+                                              
             STDMETHOD(HRESULT, "SwitchDesktop", (HWND, POINTER(IVirtualDesktop))),
-            # 11: CreateDesktopW(hMon)
+                                      
             COMMETHOD(
                 [],
                 HRESULT,
@@ -525,11 +525,11 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], HWND, "hMon"),
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # 12: MoveDesktop(desktop, hMon, index)
+                                                   
             STDMETHOD(
                 HRESULT, "MoveDesktop", (POINTER(IVirtualDesktop), HWND, UINT)
             ),
-            # 13: RemoveDesktop
+                               
             COMMETHOD(
                 [],
                 HRESULT,
@@ -537,7 +537,7 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], POINTER(IVirtualDesktop), "destroyDesktop"),
                 (["in"], POINTER(IVirtualDesktop), "fallbackDesktop"),
             ),
-            # 14: FindDesktop
+                             
             COMMETHOD(
                 [],
                 HRESULT,
@@ -545,7 +545,7 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], POINTER(GUID), "pGuid"),
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # 15: GetDesktopSwitchIncludeExcludeViews
+                                                     
             STDMETHOD(
                 HRESULT,
                 "GetDesktopSwitchIncludeExcludeViews",
@@ -555,7 +555,7 @@ class IVirtualDesktopManagerInternal(IUnknown):
                     POINTER(POINTER(IObjectArray)),
                 ),
             ),
-            # 16: SetName
+                         
             COMMETHOD(
                 [],
                 HRESULT,
@@ -566,54 +566,54 @@ class IVirtualDesktopManagerInternal(IUnknown):
         ]
 
     elif _VER in ("WIN11_22H2_L", "WIN11_23H2"):
-        # HMONITOR params removed, cleaner interface
+                                                    
         _methods_ = [
-            # 3: GetCount
+                         
             COMMETHOD([], HRESULT, "GetCount", (["out"], POINTER(UINT), "pCount")),
-            # 4: MoveViewToDesktop
+                                  
             STDMETHOD(
                 HRESULT,
                 "MoveViewToDesktop",
                 (POINTER(IApplicationView), POINTER(IVirtualDesktop)),
             ),
-            # 5: CanViewMoveDesktops
+                                    
             STDMETHOD(
                 HRESULT,
                 "CanViewMoveDesktops",
                 (POINTER(IApplicationView), POINTER(UINT)),
             ),
-            # 6: GetCurrentDesktop
+                                  
             COMMETHOD(
                 [],
                 HRESULT,
                 "GetCurrentDesktop",
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # 7: GetDesktops
+                            
             COMMETHOD(
                 [],
                 HRESULT,
                 "GetDesktops",
                 (["out"], POINTER(POINTER(IObjectArray)), "array"),
             ),
-            # 8: GetAdjacentDesktop
+                                   
             STDMETHOD(
                 HRESULT,
                 "GetAdjacentDesktop",
                 (POINTER(IVirtualDesktop), UINT, POINTER(POINTER(IVirtualDesktop))),
             ),
-            # 9: SwitchDesktop
+                              
             STDMETHOD(HRESULT, "SwitchDesktop", (POINTER(IVirtualDesktop),)),
-            # 10: CreateDesktopW
+                                
             COMMETHOD(
                 [],
                 HRESULT,
                 "CreateDesktopW",
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # 11: MoveDesktop
+                             
             STDMETHOD(HRESULT, "MoveDesktop", (POINTER(IVirtualDesktop), UINT)),
-            # 12: RemoveDesktop
+                               
             COMMETHOD(
                 [],
                 HRESULT,
@@ -621,7 +621,7 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], POINTER(IVirtualDesktop), "destroyDesktop"),
                 (["in"], POINTER(IVirtualDesktop), "fallbackDesktop"),
             ),
-            # 13: FindDesktop
+                             
             COMMETHOD(
                 [],
                 HRESULT,
@@ -629,7 +629,7 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], POINTER(GUID), "pGuid"),
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # 14: GetDesktopSwitchIncludeExcludeViews
+                                                     
             STDMETHOD(
                 HRESULT,
                 "GetDesktopSwitchIncludeExcludeViews",
@@ -639,7 +639,7 @@ class IVirtualDesktopManagerInternal(IUnknown):
                     POINTER(POINTER(IObjectArray)),
                 ),
             ),
-            # 15: SetName
+                         
             COMMETHOD(
                 [],
                 HRESULT,
@@ -650,61 +650,61 @@ class IVirtualDesktopManagerInternal(IUnknown):
         ]
 
     elif _VER == "WIN11_24H2":
-        # SwitchDesktopAndMoveForegroundView added at idx 10, shifting
-        # CreateDesktopW and subsequent methods by one slot.
+                                                                      
+                                                            
         _methods_ = [
-            # 3: GetCount
+                         
             COMMETHOD([], HRESULT, "GetCount", (["out"], POINTER(UINT), "pCount")),
-            # 4: MoveViewToDesktop
+                                  
             STDMETHOD(
                 HRESULT,
                 "MoveViewToDesktop",
                 (POINTER(IApplicationView), POINTER(IVirtualDesktop)),
             ),
-            # 5: CanViewMoveDesktops
+                                    
             STDMETHOD(
                 HRESULT,
                 "CanViewMoveDesktops",
                 (POINTER(IApplicationView), POINTER(UINT)),
             ),
-            # 6: GetCurrentDesktop
+                                  
             COMMETHOD(
                 [],
                 HRESULT,
                 "GetCurrentDesktop",
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # 7: GetDesktops
+                            
             COMMETHOD(
                 [],
                 HRESULT,
                 "GetDesktops",
                 (["out"], POINTER(POINTER(IObjectArray)), "array"),
             ),
-            # 8: GetAdjacentDesktop
+                                   
             STDMETHOD(
                 HRESULT,
                 "GetAdjacentDesktop",
                 (POINTER(IVirtualDesktop), UINT, POINTER(POINTER(IVirtualDesktop))),
             ),
-            # 9: SwitchDesktop
+                              
             STDMETHOD(HRESULT, "SwitchDesktop", (POINTER(IVirtualDesktop),)),
-            # 10: SwitchDesktopAndMoveForegroundView (NEW in 24H2)
+                                                                  
             STDMETHOD(
                 HRESULT,
                 "SwitchDesktopAndMoveForegroundView",
                 (POINTER(IVirtualDesktop),),
             ),
-            # 11: CreateDesktopW
+                                
             COMMETHOD(
                 [],
                 HRESULT,
                 "CreateDesktopW",
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # 12: MoveDesktop
+                             
             STDMETHOD(HRESULT, "MoveDesktop", (POINTER(IVirtualDesktop), UINT)),
-            # 13: RemoveDesktop
+                               
             COMMETHOD(
                 [],
                 HRESULT,
@@ -712,7 +712,7 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], POINTER(IVirtualDesktop), "destroyDesktop"),
                 (["in"], POINTER(IVirtualDesktop), "fallbackDesktop"),
             ),
-            # 14: FindDesktop
+                             
             COMMETHOD(
                 [],
                 HRESULT,
@@ -720,7 +720,7 @@ class IVirtualDesktopManagerInternal(IUnknown):
                 (["in"], POINTER(GUID), "pGuid"),
                 (["out"], POINTER(POINTER(IVirtualDesktop)), "pDesktop"),
             ),
-            # 15: GetDesktopSwitchIncludeExcludeViews
+                                                     
             STDMETHOD(
                 HRESULT,
                 "GetDesktopSwitchIncludeExcludeViews",
@@ -730,7 +730,7 @@ class IVirtualDesktopManagerInternal(IUnknown):
                     POINTER(POINTER(IObjectArray)),
                 ),
             ),
-            # 16: SetName
+                         
             COMMETHOD(
                 [],
                 HRESULT,
@@ -741,9 +741,9 @@ class IVirtualDesktopManagerInternal(IUnknown):
         ]
 
 
-# =============================================================================
-# VirtualDesktopManager wrapper class
-# =============================================================================
+                                                                               
+                                     
+                                                                               
 
 
 class VirtualDesktopManager:
@@ -792,12 +792,12 @@ class VirtualDesktopManager:
         except Exception as e:
             logger.error(f"Failed to initialize VirtualDesktopManager: {e}")
 
-    # -------------------------------------------------------------------------
-    # Internal helpers for HMONITOR-aware method calls
-    #
-    # Builds 22000-22621.2214 require an HMONITOR parameter for several
-    # methods. We pass 0 (NULL) to use the primary monitor.
-    # -------------------------------------------------------------------------
+                                                                               
+                                                      
+     
+                                                                       
+                                                           
+                                                                               
 
     def _get_desktops(self):
         """Get IObjectArray of all virtual desktops."""
@@ -824,9 +824,9 @@ class VirtualDesktopManager:
         else:
             self._internal_manager.SwitchDesktop(desktop)
 
-    # -------------------------------------------------------------------------
-    # Public IVirtualDesktopManager methods (stable across all versions)
-    # -------------------------------------------------------------------------
+                                                                               
+                                                                        
+                                                                               
 
     def is_window_on_current_desktop(self, hwnd: int) -> bool:
         """Check if a window is on the currently active virtual desktop."""
@@ -861,9 +861,9 @@ class VirtualDesktopManager:
         except Exception as e:
             logger.error(f"Failed to move window to desktop: {e}")
 
-    # -------------------------------------------------------------------------
-    # Internal helpers for name/GUID resolution
-    # -------------------------------------------------------------------------
+                                                                               
+                                               
+                                                                               
 
     def _get_name_from_registry(self, guid_str: str) -> str:
         """Get the user-set name for a desktop from the registry.
@@ -929,9 +929,9 @@ class VirtualDesktopManager:
 
         return None
 
-    # -------------------------------------------------------------------------
-    # Internal manager operations (version-aware)
-    # -------------------------------------------------------------------------
+                                                                               
+                                                 
+                                                                               
 
     def create_desktop(self, name: str = None) -> str:
         """Create a new virtual desktop and return its name."""
@@ -966,7 +966,7 @@ class VirtualDesktopManager:
             logger.error(f"Could not find desktop with GUID {target_guid_str}")
             return
 
-        # Find a fallback desktop (first desktop that isn't the target)
+                                                                       
         desktops_array = self._get_desktops()
         count = desktops_array.GetCount()
         fallback_desktop = None
@@ -1095,9 +1095,9 @@ class VirtualDesktopManager:
         return {"id": guid_str, "name": "Unknown"}
 
 
-# =============================================================================
-# Module-level convenience functions
-# =============================================================================
+                                                                               
+                                    
+                                                                               
 
 
 def create_desktop(name: str = None) -> str:

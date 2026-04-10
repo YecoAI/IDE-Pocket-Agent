@@ -1,6 +1,6 @@
 from typing import Set
 
-# Key name aliases for shortcut keys that differ from UIA SpecialKeyNames
+                                                                         
 KEY_ALIASES: dict[str, str] = {
     "backspace": "Back",
     "capslock": "Capital",

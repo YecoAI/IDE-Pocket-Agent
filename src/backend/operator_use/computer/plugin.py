@@ -40,9 +40,9 @@ class ComputerPlugin:
         if enabled:
             self._init_sync()
 
-    # ------------------------------------------------------------------
-    # Plugin interface
-    # ------------------------------------------------------------------
+                                                                        
+                      
+                                                                        
 
     def get_tools(self) -> list:
         from operator_use.computer.subagent import computer_task
@@ -64,10 +64,10 @@ class ComputerPlugin:
 
     def register_hooks(self, hooks: "Hooks") -> None:
         self._hooks = hooks
-        # Hooks are not registered to main agent (subagent manages its own state injection)
+                                                                                           
 
     def unregister_hooks(self, hooks: "Hooks") -> None:
-        # No-op: hooks were never registered to main agent
+                                                          
         pass
 
     def attach_prompt(self, context: "Context") -> None:
@@ -79,9 +79,9 @@ class ComputerPlugin:
         if self._context is not None:
             self._context.unregister_plugin_prompt(SYSTEM_PROMPT)
 
-    # ------------------------------------------------------------------
-    # Enable / disable
-    # ------------------------------------------------------------------
+                                                                        
+                      
+                                                                        
 
     def _init_sync(self) -> None:
         """Synchronously initialise Desktop and WatchDog (safe to call at startup)."""
@@ -122,9 +122,9 @@ class ComputerPlugin:
             self._context.unregister_plugin_prompt(SYSTEM_PROMPT)
         logger.info("computer_use disabled")
 
-    # ------------------------------------------------------------------
-    # Hook handlers
-    # ------------------------------------------------------------------
+                                                                        
+                   
+                                                                        
 
     async def _state_hook(self, ctx: "BeforeLLMCallContext") -> "BeforeLLMCallContext":
         from operator_use.messages import HumanMessage

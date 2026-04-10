@@ -14,11 +14,11 @@ class WatchDog:
     def __init__(self):
         self.is_running = Event()
         self._config_changed = Event()
-        self.ui_changed = Event()   # set whenever focus/structure/property fires
+        self.ui_changed = Event()                                                
         self.thread = None
         self.uia = None
 
-        # Callbacks
+                   
         self._focus_callback = None
         self._structure_callback = None
         self._structure_element = None
@@ -26,7 +26,7 @@ class WatchDog:
         self._property_element = None
         self._property_ids = None
 
-        # Internal state for tracking active handlers
+                                                     
         self._focus_handler = None
         self._structure_handler = None
         self._active_structure_element = None
@@ -50,7 +50,7 @@ class WatchDog:
         """
         if self.is_running.is_set():
             return
-        # Enable default monitors so ui_changed fires on any UI activity
+                                                                        
         if self._focus_callback is None:
             self._focus_callback = lambda *_: None
         if self._structure_callback is None:
@@ -93,7 +93,7 @@ class WatchDog:
 
     def _sync_handlers(self, FocusChangedEventHandler, StructureChangedEventHandler, PropertyChangedEventHandler):
         """Reconcile desired callback config with active COM handlers."""
-        # --- Focus Monitoring ---
+                                  
         if self._focus_callback and not self._focus_handler:
             try:
                 self._focus_handler = FocusChangedEventHandler(self)
@@ -107,7 +107,7 @@ class WatchDog:
                 logger.debug(f"Failed to remove focus handler: {e}")
             self._focus_handler = None
 
-        # --- Structure Monitoring ---
+                                      
         config_changed = (self._structure_element != self._active_structure_element)
         should_be_active = (self._structure_callback is not None)
         is_active = (self._structure_handler is not None)
@@ -132,7 +132,7 @@ class WatchDog:
             except Exception as e:
                 logger.debug(f"Failed to add structure handler: {e}")
 
-        # --- Property Monitoring ---
+                                     
         config_changed = (self._property_element != self._active_property_element) or \
                        (self._property_ids != self._active_property_ids)
         should_be_active = (self._property_callback is not None)
@@ -153,7 +153,7 @@ class WatchDog:
             try:
                 target = self._property_element if self._property_element else self.uia.GetRootElement()
                 scope = TreeScope.TreeScope_Subtree
-                # 30005: Name, 30045: Value, 30093: LegacyIAccessibleVal, 30128: ToggleState
+                                                                                            
                 p_ids = self._property_ids if self._property_ids else [30005, 30045, 30093, 30128]
                 self._property_handler = PropertyChangedEventHandler(self)
                 self.uia.AddPropertyChangedEventHandler(target, scope, None, self._property_handler, p_ids)
@@ -171,7 +171,7 @@ class WatchDog:
                 StructureChangedEventHandler,
                 PropertyChangedEventHandler
             )
-            # Initialize UIA inside the thread
+                                              
             uia_client = _AutomationClient.instance()
             self.uia = uia_client.IUIAutomation
 
@@ -185,7 +185,7 @@ class WatchDog:
         except Exception as e:
             logger.error(f"WatchDogService died: {e}")
         finally:
-            # Cleanup handlers on exit
+                                      
             if self.uia:
                 if self._focus_handler:
                     try:

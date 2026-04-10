@@ -17,7 +17,7 @@ def _parse_unified_diff(patch_content: str) -> list[tuple[int, int, list[str]]]:
     lines = patch_content.splitlines()
     i = 0
 
-    # Skip header until we find a hunk
+                                      
     while i < len(lines):
         line = lines[i]
         if line.startswith("@@"):
@@ -30,7 +30,7 @@ def _parse_unified_diff(patch_content: str) -> list[tuple[int, int, list[str]]]:
             i += 1
             continue
 
-        # Parse hunk header: @@ -old_start,old_count +new_start,new_count @@
+                                                                            
         match = re.match(r"@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@", line)
         if not match:
             i += 1
@@ -38,7 +38,7 @@ def _parse_unified_diff(patch_content: str) -> list[tuple[int, int, list[str]]]:
 
         old_start = int(match.group(1))
         old_count = int(match.group(2) or 1)
-        # new_start, new_count unused for application
+                                                     
         i += 1
 
         hunk_lines: list[str] = []
@@ -58,7 +58,7 @@ def _parse_unified_diff(patch_content: str) -> list[tuple[int, int, list[str]]]:
 def _extract_old_context(hunk_lines: list[str]) -> list[str]:
     """Extract the 'old' lines (context and removals) from a hunk for matching."""
     return [
-        line[1:]  # strip leading ' ' or '-'
+        line[1:]                            
         for line in hunk_lines
         if line.startswith((" ", "-"))
     ]
@@ -69,18 +69,18 @@ def _apply_hunk(old_lines: list[str], hunk_lines: list[str], old_start: int, old
     Apply a single hunk to old_lines. Returns the new lines.
     old_start is 1-based, old_count is number of context/removal lines.
     """
-    # Convert to 0-based index
+                              
     start_idx = old_start - 1
     end_idx = start_idx + old_count
 
-    # Build the replacement from the hunk (context and additions only)
+                                                                      
     replacement: list[str] = []
     for line in hunk_lines:
-        content = line[1:] + "\n"  # splitlines() strips newlines
+        content = line[1:] + "\n"                                
         if line.startswith(" "):
             replacement.append(content)
         elif line.startswith("-"):
-            pass  # removal
+            pass           
         elif line.startswith("+"):
             replacement.append(content)
 
@@ -94,10 +94,10 @@ def _find_hunk_position(lines: list[str], hunk_lines: list[str], old_start: int,
     """
     old_context = _extract_old_context(hunk_lines)
     if not old_context:
-        # Pure addition hunk - use old_start
+                                            
         return max(0, old_start - 1)
 
-    # Try exact match first
+                           
     start_idx = old_start - 1
     end_idx = start_idx + len(old_context)
     if end_idx <= len(lines):
@@ -105,14 +105,14 @@ def _find_hunk_position(lines: list[str], hunk_lines: list[str], old_start: int,
         if candidate == old_context:
             return start_idx
 
-    # Fuzzy match using SequenceMatcher
+                                       
     text = "\n".join(line.rstrip("\n\r") for line in lines)
     pattern = "\n".join(old_context)
     matcher = difflib.SequenceMatcher(None, text, pattern)
     match = matcher.find_longest_match(0, len(text), 0, len(pattern))
 
     if match.size > 0:
-        # Find which line this corresponds to
+                                             
         before_match = text[: match.a]
         line_num = before_match.count("\n")
         return line_num

@@ -25,8 +25,8 @@ class TreeState:
         if not self.interactive_nodes and self.status:
             parts.append(EMPTY_MESSAGE)
             return "\n".join(parts)
-        # TOON-like format: Pipe-separated values with clear header
-        # Using abbreviations in header to save tokens
+                                                                   
+                                                      
         header = "# id|window|control_type|name|coords|metadata"
         rows = [header]
         for idx, node in enumerate(self.interactive_nodes):
@@ -43,7 +43,7 @@ class TreeState:
         if not self.scrollable_nodes and self.status:
             parts.append(EMPTY_MESSAGE)
             return "\n".join(parts)
-        # TOON-like format
+                          
         header = "# id|window|control_type|name|coords|metadata"
         rows = [header]
         base_index = len(self.interactive_nodes)
@@ -116,7 +116,7 @@ class TreeElementNode:
         self.center=node.center
         self.metadata=node.metadata
 
-    # Legacy method kept for compatibility if needed, but not used in new format
+                                                                                
     def to_row(self, index: int):
         return [index, self.window_name, self.control_type, self.name, self.value, self.shortcut, self.center.to_string(),self.is_focused]
 
@@ -129,7 +129,7 @@ class ScrollElementNode:
     center: Center
     metadata:dict[str,Any]=field(default_factory=dict)
 
-    # Legacy method kept for compatibility
+                                          
     def to_row(self, index: int, base_index: int):
         return [
             base_index + index,

@@ -5,7 +5,6 @@ import sys
 from typing import Optional, Dict, Any
 from src.config import settings
 
-# OS Specific Imports
 if sys.platform == "win32":
     try:
         import win32crypt
@@ -23,7 +22,6 @@ KEYRING_SERVICE = "IDE-Pocket-Agent"
 KEYRING_ACCOUNT = "agent_credentials"
 
 def load_credentials() -> Optional[Dict[str, Any]]:
-    # 1. Try Keyring (macOS/Linux preferred)
     if sys.platform != "win32" and keyring:
         try:
             data = keyring.get_password(KEYRING_SERVICE, KEYRING_ACCOUNT)
@@ -49,7 +47,6 @@ def load_credentials() -> Optional[Dict[str, Any]]:
             if all(k in creds for k in ("access_token", "association_id")):
                 return creds
         else:
-            # Simple fallback for non-Windows if file exists (unlikely to be encrypted)
             creds = json.loads(encrypted_data.decode("utf-8"))
             return creds
     except Exception:

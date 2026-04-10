@@ -29,11 +29,11 @@ class CacheRequestFactory:
         """
         cache_request = CacheRequest()
 
-        # Set scope to cache element and its children
-        # This allows us to get children with pre-cached properties
+                                                     
+                                                                   
         cache_request.TreeScope = TreeScope.TreeScope_Element | TreeScope.TreeScope_Children
 
-        # Basic identification properties
+                                         
         cache_request.AddProperty(PropertyId.NameProperty)
         cache_request.AddProperty(PropertyId.AutomationIdProperty)
         cache_request.AddProperty(PropertyId.LocalizedControlTypeProperty)
@@ -41,7 +41,7 @@ class CacheRequestFactory:
         cache_request.AddProperty(PropertyId.ClassNameProperty)
         cache_request.AddProperty(PropertyId.ControlTypeProperty)
 
-        # State properties for visibility and interaction checks
+                                                                
         cache_request.AddProperty(PropertyId.IsEnabledProperty)
         cache_request.AddProperty(PropertyId.IsOffscreenProperty)
         cache_request.AddProperty(PropertyId.IsControlElementProperty)
@@ -49,46 +49,46 @@ class CacheRequestFactory:
         cache_request.AddProperty(PropertyId.IsKeyboardFocusableProperty)
         cache_request.AddProperty(PropertyId.IsPasswordProperty)
 
-        # Layout properties
+                           
         cache_request.AddProperty(PropertyId.BoundingRectangleProperty)
         cache_request.AddProperty(PropertyId.HelpTextProperty)
 
-        # Patterns
+                  
         cache_request.AddPattern(PatternId.LegacyIAccessiblePattern)
         cache_request.AddPattern(PatternId.ScrollPattern)
         cache_request.AddPattern(PatternId.WindowPattern)
 
-        # LegacyIAccessible properties
+                                      
         cache_request.AddProperty(PropertyId.LegacyIAccessibleRoleProperty)
         cache_request.AddProperty(PropertyId.LegacyIAccessibleValueProperty)
         cache_request.AddProperty(PropertyId.LegacyIAccessibleDefaultActionProperty)
         cache_request.AddProperty(PropertyId.LegacyIAccessibleStateProperty)
 
-        # Scroll properties
+                           
         cache_request.AddProperty(PropertyId.ScrollHorizontallyScrollableProperty)
         cache_request.AddProperty(PropertyId.ScrollVerticallyScrollableProperty)
         cache_request.AddProperty(PropertyId.ScrollHorizontalScrollPercentProperty)
         cache_request.AddProperty(PropertyId.ScrollVerticalScrollPercentProperty)
 
-        # ExpandCollapse properties
+                                   
         cache_request.AddProperty(PropertyId.ExpandCollapseExpandCollapseStateProperty)
 
-        # Selection properties
+                              
         cache_request.AddProperty(PropertyId.SelectionCanSelectMultipleProperty)
         cache_request.AddProperty(PropertyId.SelectionIsSelectionRequiredProperty)
         cache_request.AddProperty(PropertyId.SelectionSelectionProperty)
 
-        # SelectionItem properties
+                                  
         cache_request.AddProperty(PropertyId.SelectionItemIsSelectedProperty)
         cache_request.AddProperty(PropertyId.SelectionItemSelectionContainerProperty)
 
-        # Window properties
+                           
         cache_request.AddProperty(PropertyId.WindowIsModalProperty)
 
-        # Toggle properties (ButtonControl, CheckBoxControl)
+                                                            
         cache_request.AddProperty(PropertyId.ToggleToggleStateProperty)
 
-        # RangeValue properties (SliderControl)
+                                               
         cache_request.AddProperty(PropertyId.RangeValueValueProperty)
         cache_request.AddProperty(PropertyId.RangeValueMinimumProperty)
         cache_request.AddProperty(PropertyId.RangeValueMaximumProperty)
@@ -140,15 +140,15 @@ class CachedControlHelper:
         if cache_request is None:
             cache_request = CacheRequestFactory.create_tree_traversal_cache()
 
-        # Ensure the cache request includes children
-        # Note: We do NOT set this here to avoid modifying shared cache request objects
-        # The caller is responsible for providing a CacheRequest with TreeScope_Children
+                                                    
+                                                                                       
+                                                                                        
         if (cache_request.TreeScope & TreeScope.TreeScope_Children) == 0:
              logger.warning("Cache request passed to get_cached_children does not have Children scope!")
 
-        # Try to use existing cache first if available
+                                                      
         try:
-            # Build updated cache that includes children
+                                                        
             cached_node = node.BuildUpdatedCache(cache_request)
             children = cached_node.GetCachedChildren()
 

@@ -25,9 +25,9 @@ from .core import _AutomationClient, IUIAutomationElement
 from .patterns import *
 
 
-METRO_WINDOW_CLASS_NAME = 'Windows.UI.Core.CoreWindow'  # for Windows 8 and 8.1
-SEARCH_INTERVAL = 0.5  # search control interval seconds
-MAX_MOVE_SECOND = 1  # simulate mouse move or drag max seconds
+METRO_WINDOW_CLASS_NAME = 'Windows.UI.Core.CoreWindow'                         
+SEARCH_INTERVAL = 0.5                                   
+MAX_MOVE_SECOND = 1                                           
 TIME_OUT_SECOND = 10
 OPERATION_WAIT_TIME = 0.5
 MAX_PATH = 260
@@ -38,8 +38,8 @@ S_OK = 0
 IsPy38OrHigher = sys.version_info[:2] >= (3, 8)
 IsNT6orHigher = os.sys.getwindowsversion().major >= 6
 CurrentProcessIs64Bit = sys.maxsize > 0xFFFFFFFF
-ProcessTime = time.perf_counter  # this returns nearly 0 when first call it if python version <= 3.6
-ProcessTime()  # need to call it once if python version <= 3.6
+ProcessTime = time.perf_counter                                                                     
+ProcessTime()                                                 
 TreeNode = Any
 
 class Control():
@@ -500,9 +500,9 @@ class Control():
         """
         return self.Element.CurrentControlType
 
-    # @property
-    # def ControllerFor(self):
-        # return self.Element.CurrentControllerFor
+               
+                              
+                                                  
 
     @property
     def Culture(self) -> int:
@@ -513,13 +513,13 @@ class Control():
         """
         return self.Element.CurrentCulture
 
-    # @property
-    # def DescribedBy(self):
-        # return self.Element.CurrentDescribedBy
+               
+                            
+                                                
 
-    # @property
-    # def FlowsTo(self):
-        # return self.Element.CurrentFlowsTo
+               
+                        
+                                            
 
     @property
     def FrameworkId(self) -> str:
@@ -639,9 +639,9 @@ class Control():
         """
         return self.Element.CurrentItemType
 
-    # @property
-    # def LabeledBy(self):
-        # return self.Element.CurrentLabeledBy
+               
+                          
+                                              
 
     @property
     def LocalizedControlType(self) -> str:
@@ -659,7 +659,7 @@ class Control():
         Call IUIAutomationElement::get_CurrentName.
         Refer https://docs.microsoft.com/en-us/windows/win32/api/uiautomationclient/nf-uiautomationclient-iuiautomationelement-get_currentname
         """
-        return self.Element.CurrentName or ''   # CurrentName may be None
+        return self.Element.CurrentName or ''                            
 
     @property
     def NativeWindowHandle(self) -> int:
@@ -948,8 +948,8 @@ class Control():
         """
         return self.Element.GetRuntimeId()
 
-    # QueryInterface
-    # Release
+                    
+             
 
     def SetFocus(self) -> bool:
         """
@@ -1126,7 +1126,7 @@ class Control():
                     return False
             elif 'Compare' == key:
                 compareFunc = value
-        # use Compare at last
+                             
         if compareFunc and not compareFunc(control, depth):
             return False
         return True
@@ -1139,8 +1139,8 @@ class Control():
         Return bool, True if find
         """
         if self._element and self._elementDirectAssign:
-            # if element is directly assigned, not by searching, just check whether self._element is valid
-            # but I can't find an API in UIAutomation that can directly check
+                                                                                                          
+                                                                             
             rootElement = _AutomationClient.instance().IUIAutomation.GetRootElement()
             if _AutomationClient.instance().IUIAutomation.CompareElements(self._element, rootElement):
                 return True
@@ -1150,12 +1150,12 @@ class Control():
                     return True
                 else:
                     return False
-        # find the element
+                          
         if not self.searchProperties:
             raise LookupError("control's searchProperties must not be empty!")
         self._element = None
         startTime = ProcessTime()
-        # Use same timeout(s) parameters for resolve all parents
+                                                                
         prev = self.searchFromControl
         if prev and not prev._element and not prev.Exists(maxSearchSeconds, searchIntervalSeconds):
             return False
@@ -1166,7 +1166,7 @@ class Control():
             control = FindControl(self.searchFromControl, self._CompareFunction, self.searchDepth, False, self.foundIndex)
             if control:
                 self._element = control.Element
-                control._element = 0  # control will be destroyed, but the element needs to be stored in self._element
+                control._element = 0                                                                                  
                 return True
             else:
                 remain = startTime + maxSearchSeconds - ProcessTime()
@@ -1186,7 +1186,7 @@ class Control():
         start = ProcessTime()
         while True:
             temp = DEBUG_EXIST_DISAPPEAR
-            DEBUG_EXIST_DISAPPEAR = False  # do not print for Exists
+            DEBUG_EXIST_DISAPPEAR = False                           
             if not self.Exists(0, 0, False):
                 DEBUG_EXIST_DISAPPEAR = temp
                 return True
@@ -1499,7 +1499,7 @@ class Control():
                 else:
                     return ControlFromHandle(topHandle)
             else:
-                # self is root control
+                                      
                 pass
         else:
             control = self
@@ -2551,7 +2551,7 @@ class ComboBoxControl(Control):
         if expandCollapsePattern:
             expandCollapsePattern.Expand()
         else:
-            # Windows Form's ComboBoxControl doesn't support ExpandCollapsePattern
+                                                                                  
             self.Click(x=-10, ratioY=0.5, simulateMove=simulateMove)
         find = False
         if condition:
@@ -2565,7 +2565,7 @@ class ComboBoxControl(Control):
             listItemControl.Click(simulateMove=simulateMove, waitTime=waitTime)
             find = True
         else:
-            # some ComboBox's popup window is a child of root control
+                                                                     
             listControl = ListControl(searchDepth=1)
             if listControl.Exists(1):
                 if condition:
@@ -3315,7 +3315,7 @@ class TopLevel():
                 ret = ShowWindow(handle, SW.Restore)
             elif not IsWindowVisible(handle):
                 ret = ShowWindow(handle, SW.Show)
-            ret = SetForegroundWindow(handle)  # may fail if foreground windows's process is not python
+            ret = SetForegroundWindow(handle)                                                          
             time.sleep(waitTime)
             return ret
         return False
@@ -4260,7 +4260,7 @@ def WalkTree(top, getChildren: Optional[Callable[[TreeNode], List[TreeNode]]] = 
                 yield top, 0, 0
         children = getChildren(top)
         childList = [children]
-        while depth >= 0:  # or while childList:
+        while depth >= 0:                       
             lastItems = childList[-1]
             if lastItems:
                 if not yieldCondition or yieldCondition(lastItems[0], depth + 1):
@@ -4280,7 +4280,7 @@ def WalkTree(top, getChildren: Optional[Callable[[TreeNode], List[TreeNode]]] = 
                 yield top, 0
         child = getFirstChild(top)
         childList = [child]
-        while depth >= 0:  # or while childList:
+        while depth >= 0:                       
             lastItem = childList[-1]
             if lastItem:
                 if not yieldCondition or yieldCondition(lastItem, depth + 1):
@@ -4319,25 +4319,25 @@ def GetFocusedControl() -> Optional[Control]:
 def GetForegroundControl() -> Control:
     """Return `Control` subclass."""
     return ControlFromHandle(GetForegroundWindow())
-    # another implement
-    #focusedControl = GetFocusedControl()
-    #parentControl = focusedControl
-    #controlList = []
-    # while parentControl:
-        #controlList.insert(0, parentControl)
-        #parentControl = parentControl.GetParentControl()
-    # if len(controlList) == 1:
-        #parentControl = controlList[0]
-    # else:
-        #parentControl = controlList[1]
-    # return parentControl
+                       
+                                         
+                                   
+                     
+                          
+                                             
+                                                         
+                               
+                                       
+           
+                                       
+                          
 
 
 def GetConsoleWindow() -> Optional[WindowControl]:
     """Return `WindowControl` or None, a console window that runs python."""
     consoleWindow = ControlFromHandle(ctypes.windll.kernel32.GetConsoleWindow())
     if consoleWindow and consoleWindow.ClassName == 'PseudoConsoleWindow':
-        # Windows Terminal
+                          
         consoleWindow = consoleWindow.GetParentControl()
     return consoleWindow
 
@@ -4490,14 +4490,14 @@ def FindControl(control: Optional[Control], compare: Callable[[Control, int], bo
 def ShowDesktop(waitTime: float = 1) -> None:
     """Show Desktop by pressing win + d"""
     SendKeys('{Win}d', waitTime=waitTime)
-    # another implement
-    #paneTray = PaneControl(searchDepth = 1, ClassName = 'Shell_TrayWnd')
-    # if paneTray.Exists():
-        #WM_COMMAND = 0x111
-        #MIN_ALL = 419
-        #MIN_ALL_UNDO = 416
-        #PostMessage(paneTray.NativeWindowHandle, WM_COMMAND, MIN_ALL, 0)
-        # time.sleep(1)
+                       
+                                                                         
+                           
+                           
+                      
+                           
+                                                                         
+                       
 
 
 def WaitHotKeyReleased(hotkey: Tuple[int, int]) -> None:

@@ -33,13 +33,13 @@ class ComputerTool(BaseModel):
             "  desktop  — Manage Windows virtual desktops: create, remove, rename, or switch.\n"
         ),
     )
-    # Coordinates — used by click, type, scroll, move
+                                                     
     loc: Optional[list[int]] = Field(
         default=None,
         description="[x, y] pixel coordinates from the Interactive Elements list. Required for click, type, move. Optional for scroll (omit to scroll at current cursor).",
         examples=[[640, 360], [100, 200]],
     )
-    # click
+           
     button: Literal["left", "right", "middle"] = Field(
         default="left",
         description="Mouse button: 'left' for standard clicks, 'right' for context menus, 'middle' for middle-click (action=click).",
@@ -49,7 +49,7 @@ class ComputerTool(BaseModel):
         description="Number of clicks: 1=single click, 2=double click (open files/folders), 0=hover only (action=click).",
         examples=[1, 2],
     )
-    # type
+          
     text: Optional[str] = Field(
         default=None,
         description="Text to type into the focused field (action=type).",
@@ -67,7 +67,7 @@ class ComputerTool(BaseModel):
         default=False,
         description="Press Enter after typing to submit the input (action=type).",
     )
-    # scroll
+            
     axis: Literal["vertical", "horizontal"] = Field(
         default="vertical",
         description="Scroll axis: 'vertical' for up/down, 'horizontal' for left/right (action=scroll).",
@@ -81,24 +81,24 @@ class ComputerTool(BaseModel):
         description="Number of scroll increments. Each scrolls ~3-5 lines. Use 3-5 for moderate, 10+ for large jumps (action=scroll).",
         examples=[1, 3, 5, 10],
     )
-    # move
+          
     drag: bool = Field(
         default=False,
         description="Hold left mouse button and drag from current position to loc (action=move). False = move/hover only.",
     )
-    # shortcut
+              
     shortcut: Optional[str] = Field(
         default=None,
         description="Keyboard shortcut using '+' to combine keys (action=shortcut). Examples: 'ctrl+c', 'alt+tab', 'ctrl+shift+n', 'win', 'enter', 'escape'.",
         examples=["ctrl+c", "ctrl+v", "alt+tab", "win", "enter", "escape"],
     )
-    # wait
+          
     duration: Optional[int] = Field(
         default=None,
         description="Seconds to pause (action=wait). Use 2-3s for UI transitions, 5s for app launches, 10s+ for installs.",
         examples=[2, 5, 10],
     )
-    # desktop
+             
     desktop_action: Optional[Literal["create", "remove", "rename", "switch"]] = Field(
         default=None,
         description="Virtual desktop operation: create, remove, rename, or switch (action=desktop).",
@@ -119,7 +119,7 @@ class ComputerTool(BaseModel):
     def _coerce_params(cls, data: dict) -> dict:
         if not isinstance(data, dict):
             return data
-        # list fields: parse JSON strings
+                                         
         for field in ("loc",):
             v = data.get(field)
             if v is None or v == "null":
@@ -131,12 +131,12 @@ class ComputerTool(BaseModel):
                         data[field] = parsed
                 except (json.JSONDecodeError, ValueError):
                     pass
-        # bool fields
+                     
         for field in ("clear", "press_enter", "drag"):
             v = data.get(field)
             if isinstance(v, str):
                 data[field] = v.lower() not in ("false", "0", "no", "null", "none", "")
-        # int fields
+                    
         for field in ("clicks", "wheel_times"):
             v = data.get(field)
             if isinstance(v, str):
@@ -144,7 +144,7 @@ class ComputerTool(BaseModel):
                     data[field] = int(v)
                 except (ValueError, TypeError):
                     pass
-        # nullable int fields
+                             
         for field in ("duration",):
             v = data.get(field)
             if v is None or v == "null":
@@ -154,7 +154,7 @@ class ComputerTool(BaseModel):
                     data[field] = int(v)
                 except (ValueError, TypeError):
                     pass
-        # nullable str fields
+                             
         for field in ("shortcut", "text", "desktop_name", "new_name", "desktop_action"):
             v = data.get(field)
             if v == "null":

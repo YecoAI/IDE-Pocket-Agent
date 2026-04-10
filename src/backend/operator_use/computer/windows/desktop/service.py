@@ -30,9 +30,9 @@ class Desktop:
     def get_state(self,as_bytes:bool=False)->DesktopState:
         start_time = perf_counter()
 
-        controls_handles=self.get_controls_handles() # Taskbar,Program Manager,Apps, Dialogs
-        windows,windows_handles=self.get_windows(controls_handles=controls_handles) # Apps
-        active_window=self.get_active_window(windows=windows) #Active Window
+        controls_handles=self.get_controls_handles()                                        
+        windows,windows_handles=self.get_windows(controls_handles=controls_handles)       
+        active_window=self.get_active_window(windows=windows)               
         active_window_handle=active_window.handle if active_window else None
 
         try:
@@ -48,7 +48,7 @@ class Desktop:
         logger.debug(f"Active window: {active_window or 'No Active Window Found'}")
         logger.debug(f"Windows: {windows}")
 
-        #Preparing handles for Tree
+                                   
         other_windows_handles=list(controls_handles-windows_handles)
 
         if self.use_accessibility:
@@ -96,11 +96,11 @@ class Desktop:
             encoded = base64.b64encode(command.encode("utf-16le")).decode("ascii")
             result = subprocess.run(
                 ['powershell', '-NoProfile', '-EncodedCommand', encoded],
-                capture_output=True,  # No errors='ignore' - let subprocess return bytes
+                capture_output=True,                                                    
                 timeout=timeout,
                 cwd=os.path.expanduser(path='~')
             )
-            # Handle both bytes and str output (subprocess behavior varies by environment)
+                                                                                          
             stdout = result.stdout
             stderr = result.stderr
             if isinstance(stdout, bytes):
@@ -132,7 +132,7 @@ class Desktop:
 
     def get_controls_handles(self,optimized:bool=False):
         handles = set()
-        # For even more faster results (still under development)
+                                                                
         def callback(hwnd, _):
             if win32gui.IsWindowVisible(hwnd) and is_window_on_current_desktop(hwnd):
                 handles.add(hwnd)
@@ -161,7 +161,7 @@ class Desktop:
                 if window.handle!=active_window_handle:
                     continue
                 return window
-            # In case active window is not present in the windows list
+                                                                      
             return Window(**{
                 "name":active_window.Name,
                 "is_browser":self.is_window_browser(active_window),
@@ -215,7 +215,7 @@ class Desktop:
                 except Exception:
                     continue
 
-                # Filter out Overlays (e.g. NVIDIA, Steam)
+                                                          
                 if self.is_overlay_window(child):
                     continue
 
@@ -277,7 +277,7 @@ class Desktop:
 
     def get_annotated_screenshot(self, nodes: list[TreeElementNode],as_bytes:bool=False) -> bytes|Image.Image:
         screenshot = self.get_screenshot()
-        # Add padding
+                     
         padding = 5
         width = int(screenshot.width + (1.5 * padding))
         height = int(screenshot.height + (1.5 * padding))
@@ -300,29 +300,29 @@ class Desktop:
             box = node.bounding_box
             color = get_random_color()
 
-            # Scale and pad the bounding box also clip the bounding box
-            # Adjust for virtual screen offset so coordinates map to the screenshot image
+                                                                       
+                                                                                         
             adjusted_box = (
                 int(box.left - left_offset) + padding,
                 int(box.top - top_offset) + padding,
                 int(box.right - left_offset) + padding,
                 int(box.bottom - top_offset) + padding
             )
-            # Draw bounding box
+                               
             draw.rectangle(adjusted_box, outline=color, width=2)
 
-            # Label dimensions
+                              
             label_width = draw.textlength(str(label), font=font)
             label_height = font_size
             left, top, right, bottom = adjusted_box
 
-            # Label position above bounding box
+                                               
             label_x1 = right - label_width
             label_y1 = top - label_height - 4
             label_x2 = label_x1 + label_width
             label_y2 = label_y1 + label_height + 4
 
-            # Draw label background and text
+                                            
             draw.rectangle([(label_x1, label_y1), (label_x2, label_y2)], fill=color)
             draw.text((label_x1 + 2, label_y1 + 2), str(label), fill=(255, 255, 255), font=font)
 

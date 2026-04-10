@@ -31,7 +31,7 @@ class BaseChatLLM(Protocol):
                 enum_vals = None
                 description = None
 
-            # Normalize to valid JSON schema types
+                                                  
             if t not in {"string", "integer", "number", "boolean", "array", "object"}:
                 t = "string"
 

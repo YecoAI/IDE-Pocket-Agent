@@ -9,7 +9,7 @@ import base64
 try:
     from PIL.Image import Image
 except ImportError:
-    Image = None  # type: ignore
+    Image = None                
 
 
 class Usage(BaseModel):

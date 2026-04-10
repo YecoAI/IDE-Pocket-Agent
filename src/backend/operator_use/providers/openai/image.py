@@ -9,11 +9,11 @@ from operator_use.providers.base import BaseImage
 
 logger = logging.getLogger(__name__)
 
-# GPT Image models use "low"/"medium"/"high"/"auto" for quality.
-# DALL-E 3 uses "standard"/"hd". DALL-E 2 does not support quality at all.
+                                                                
+                                                                          
 _GPT_IMAGE_MODELS = {"gpt-image-1", "gpt-image-1.5", "gpt-image-1-mini", "chatgpt-image-latest"}
 _DALLE3_MODELS = {"dall-e-3"}
-_NO_EDIT_MODELS = {"dall-e-3"}  # dall-e-3 has no editing endpoint
+_NO_EDIT_MODELS = {"dall-e-3"}                                    
 
 
 class ImageOpenAI(BaseImage):
@@ -113,7 +113,7 @@ class ImageOpenAI(BaseImage):
         elif self._model in _DALLE3_MODELS:
             params["quality"] = kwargs.get("quality", self.quality)
             params["style"] = kwargs.get("style", self.style)
-        # DALL-E 2: no quality param
+                                    
         return params
 
     def generate(self, prompt: str, output_path: str, images: list[str] | None = None, **kwargs) -> None:
@@ -135,7 +135,7 @@ class ImageOpenAI(BaseImage):
                 finally:
                     for f in image_files:
                         f.close()
-            else:  # dall-e-2: first image = source, second = optional mask
+            else:                                                          
                 edit_kwargs: dict = dict(
                     model=self._model,
                     image=open(images[0], "rb"),
@@ -177,7 +177,7 @@ class ImageOpenAI(BaseImage):
                 finally:
                     for f in image_files:
                         f.close()
-            else:  # dall-e-2
+            else:            
                 edit_kwargs: dict = dict(
                     model=self._model,
                     image=open(images[0], "rb"),

@@ -24,9 +24,9 @@ import comtypes.client
 from typing import (Any, Callable, Dict, List, Tuple, Optional)
 
 
-METRO_WINDOW_CLASS_NAME = 'Windows.UI.Core.CoreWindow'  # for Windows 8 and 8.1
-SEARCH_INTERVAL = 0.5  # search control interval seconds
-MAX_MOVE_SECOND = 1  # simulate mouse move or drag max seconds
+METRO_WINDOW_CLASS_NAME = 'Windows.UI.Core.CoreWindow'                         
+SEARCH_INTERVAL = 0.5                                   
+MAX_MOVE_SECOND = 1                                           
 TIME_OUT_SECOND = 10
 OPERATION_WAIT_TIME = 0.5
 MAX_PATH = 260
@@ -37,8 +37,8 @@ S_OK = 0
 IsPy38OrHigher = sys.version_info[:2] >= (3, 8)
 IsNT6orHigher = os.sys.getwindowsversion().major >= 6
 CurrentProcessIs64Bit = sys.maxsize > 0xFFFFFFFF
-ProcessTime = time.perf_counter  # this returns nearly 0 when first call it if python version <= 3.6
-ProcessTime()  # need to call it once if python version <= 3.6
+ProcessTime = time.perf_counter                                                                     
+ProcessTime()                                                 
 TreeNode = Any
 from .enums import *
 
@@ -97,7 +97,7 @@ class _AutomationClient:
                 self.UIAutomationCore = comtypes.client.GetModule("UIAutomationCore.dll")
                 self.IUIAutomation = comtypes.client.CreateObject("{ff48dba4-60ef-4201-aa87-54103eef594e}", interface=self.UIAutomationCore.IUIAutomation)
                 self.ViewWalker = self.IUIAutomation.RawViewWalker
-                #self.ViewWalker = self.IUIAutomation.ControlViewWalker
+                                                                       
                 break
             except Exception as ex:
                 if retry + 1 == tryCount:
@@ -105,7 +105,7 @@ class _AutomationClient:
 
 
 
-# set Windows dll restype
+                         
 ctypes.windll.user32.GetAncestor.restype = ctypes.c_void_p
 ctypes.windll.user32.GetClipboardData.restype = ctypes.c_void_p
 ctypes.windll.user32.GetDC.restype = ctypes.c_void_p
@@ -175,7 +175,7 @@ def WindowFromPoint(x: int, y: int) -> int:
     WindowFromPoint from Win32.
     Return int, a native window handle.
     """
-    return ctypes.windll.user32.WindowFromPoint(ctypes.wintypes.POINT(x, y))  # or ctypes.windll.user32.WindowFromPoint(x, y)
+    return ctypes.windll.user32.WindowFromPoint(ctypes.wintypes.POINT(x, y))                                                 
 
 
 def GetCursorPos() -> Tuple[int, int]:
@@ -405,8 +405,8 @@ def MoveTo(x: int, y: int, moveSpeed: float = 1, waitTime: float = OPERATION_WAI
         for i in range(stepCount):
             cx = curX + int(xStep * i)
             cy = curY + int(yStep * i)
-            # upper-left(0,0), lower-right(65536,65536)
-            # mouse_event(MouseEventFlag.Move | MouseEventFlag.Absolute, cx*65536//screenWidth, cy*65536//screenHeight, 0, 0)
+                                                       
+                                                                                                                             
             SetCursorPos(cx, cy)
             time.sleep(interval)
     SetCursorPos(x, y)
@@ -466,7 +466,7 @@ def WheelDown(wheelTimes: int = 1, interval: float = 0.05, waitTime: float = OPE
     waitTime: float.
     """
     for _i in range(wheelTimes):
-        mouse_event(MouseEventFlag.Wheel, 0, 0, -120, 0)  # WHEEL_DELTA=120
+        mouse_event(MouseEventFlag.Wheel, 0, 0, -120, 0)                   
         time.sleep(interval)
     time.sleep(waitTime)
 
@@ -479,7 +479,7 @@ def WheelUp(wheelTimes: int = 1, interval: float = 0.05, waitTime: float = OPERA
     waitTime: float.
     """
     for _i in range(wheelTimes):
-        mouse_event(MouseEventFlag.Wheel, 0, 0, 120, 0)  # WHEEL_DELTA=120
+        mouse_event(MouseEventFlag.Wheel, 0, 0, 120, 0)                   
         time.sleep(interval)
     time.sleep(waitTime)
 
@@ -542,8 +542,8 @@ def SetScreenSize(width: int, height: int) -> bool:
     """
     Return bool.
     """
-    # the size of DEVMODEW structure is too big for wrapping in ctypes,
-    # so I use bytearray to simulate the structure.
+                                                                       
+                                                   
     devModeSize = 220
     dmSizeOffset = 68
     dmFieldsOffset = 72
@@ -663,7 +663,7 @@ def SwitchToThisWindow(handle: int) -> None:
     SwitchToThisWindow from Win32.
     handle: int, the handle of a native window.
     """
-    ctypes.windll.user32.SwitchToThisWindow(ctypes.c_void_p(handle), ctypes.c_int(1))  # void function, no return
+    ctypes.windll.user32.SwitchToThisWindow(ctypes.c_void_p(handle), ctypes.c_int(1))                            
 
 
 def GetAncestor(handle: int, flag: int) -> int:
@@ -812,10 +812,10 @@ def GetEditText(handle: int) -> str:
     handle: int, the handle of a native window.
     Return str.
     """
-    textLen = SendMessage(handle, 0x000E, 0, 0) + 1  # WM_GETTEXTLENGTH
+    textLen = SendMessage(handle, 0x000E, 0, 0) + 1                    
     arrayType = ctypes.c_wchar * textLen
     values = arrayType()
-    SendMessage(handle, 0x000D, textLen, ctypes.addressof(values))  # WM_GETTEXT
+    SendMessage(handle, 0x000D, textLen, ctypes.addressof(values))              
     return values.value
 
 
@@ -923,7 +923,7 @@ def IsDesktopLocked() -> bool:
     Desktop is locked if press Win+L, Ctrl+Alt+Del or in remote desktop mode.
     """
     isLocked = False
-    desk = ctypes.windll.user32.OpenDesktopW(ctypes.c_wchar_p('Default'), ctypes.c_uint(0), ctypes.c_int(0), ctypes.c_uint(0x0100))  # DESKTOP_SWITCHDESKTOP = 0x0100
+    desk = ctypes.windll.user32.OpenDesktopW(ctypes.c_wchar_p('Default'), ctypes.c_uint(0), ctypes.c_int(0), ctypes.c_uint(0x0100))                                  
     if desk:
         isLocked = not ctypes.windll.user32.SwitchDesktop(ctypes.c_void_p(desk))
         ctypes.windll.user32.CloseDesktop(ctypes.c_void_p(desk))
@@ -964,7 +964,7 @@ def IsProcess64Bit(processId: int) -> Optional[bool]:
         IsWow64Process = ctypes.windll.kernel32.IsWow64Process
     except Exception:
         return False
-    hProcess = ctypes.windll.kernel32.OpenProcess(0x1000, 0, processId)  # PROCESS_QUERY_INFORMATION=0x0400,PROCESS_QUERY_LIMITED_INFORMATION=0x1000
+    hProcess = ctypes.windll.kernel32.OpenProcess(0x1000, 0, processId)                                                                             
     if hProcess:
         hProcess = ctypes.c_void_p(hProcess)
         isWow64 = ctypes.wintypes.BOOL()
@@ -1080,12 +1080,12 @@ def SendInput(*inputs) -> int:
     for ip in inputs:
         ret = ctypes.windll.user32.SendInput(1, ctypes.byref(ip), cbSize)
     return ret
-    # or one call
-    #nInputs = len(inputs)
-    #LPINPUT = INPUT * nInputs
-    #pInputs = LPINPUT(*inputs)
-    #cbSize = ctypes.c_int(ctypes.sizeof(INPUT))
-    # return ctypes.windll.user32.SendInput(nInputs, ctypes.byref(pInputs), cbSize)
+                 
+                          
+                              
+                               
+                                                
+                                                                                   
 
 
 def SendUnicodeChar(char: str, charMode: bool = True) -> int:
@@ -1222,7 +1222,7 @@ def SendKeys(text: str, interval: float = 0.01, waitTime: float = OPERATION_WAIT
     while True:
         if text[i] == '{':
             rindex = text.find('}', i)
-            if rindex == i + 1:  # {}}
+            if rindex == i + 1:       
                 rindex = text.find('}', i + 2)
             if rindex == -1:
                 raise ValueError('"{" or "{}" is not valid, use "{{}" for "{", use "{}}" for "}"')
@@ -1343,8 +1343,8 @@ def SendKeys(text: str, interval: float = 0.01, waitTime: float = OPERATION_WAIT
                     if keys[i + 1][1] == 'UnicodeChar' or keys[i + 1][1] & KeyboardEventFlag.KeyUp == 0:
                         time.sleep(interval)
                     else:
-                        time.sleep(hotkeyInterval)  # must sleep for a while, otherwise combined keys may not be caught
-                else:  # KeyboardEventFlag.KeyDown
+                        time.sleep(hotkeyInterval)                                                                     
+                else:                             
                     time.sleep(hotkeyInterval)
     time.sleep(waitTime)
 
@@ -1355,8 +1355,8 @@ def SetThreadDpiAwarenessContext(dpiAwarenessContext: int):
     dpiAwarenessContext: int, a value in class `DpiAwarenessContext`
     """
     try:
-        # https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setthreaddpiawarenesscontext
-        # Windows 10 1607+
+                                                                                                            
+                          
         ctypes.windll.user32.SetThreadDpiAwarenessContext.restype = ctypes.c_void_p
         oldContext = ctypes.windll.user32.SetThreadDpiAwarenessContext(ctypes.c_void_p(dpiAwarenessContext))
         return oldContext
@@ -1372,12 +1372,12 @@ def SetProcessDpiAwareness(dpiAwareness: int):
     dpiAwareness: int, a value in class `ProcessDpiAwareness`
     """
     try:
-        # https://docs.microsoft.com/en-us/windows/win32/api/shellscalingapi/nf-shellscalingapi-setprocessdpiawareness
-        # Once set, any future calls will fail. Windows 8.1+
+                                                                                                                      
+                                                            
         return ctypes.windll.shcore.SetProcessDpiAwareness(dpiAwareness)
     except Exception:
         try:
-            # Fallback for Windows 7 / older: system DPI aware (no per-monitor)
+                                                                               
             ctypes.windll.user32.SetProcessDPIAware()
         except Exception:
             pass
@@ -1392,7 +1392,7 @@ def SetProcessDpiAwarenessContext(dpiAwarenessContext: int) -> bool:
     Returns True if successful.
     """
     try:
-        # https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setprocessdpiawarenesscontext
+                                                                                                             
         result = ctypes.windll.user32.SetProcessDpiAwarenessContext(
             ctypes.c_void_p(dpiAwarenessContext)
         )
@@ -1401,8 +1401,8 @@ def SetProcessDpiAwarenessContext(dpiAwarenessContext: int) -> bool:
         return False
 
 
-# Ensure DPI-aware coordinates at module load (before any UIA calls).
-# Try Per-Monitor V2 first (Win 10 1703+), then shcore (Win 8.1+), then legacy.
+                                                                     
+                                                                               
 if not SetProcessDpiAwarenessContext(DpiAwarenessContext.PerMonitorAwareV2):
     SetProcessDpiAwareness(ProcessDpiAwareness.PerMonitorDpiAware)
 
@@ -1425,11 +1425,11 @@ class tagPROCESSENTRY32(ctypes.Structure):
 class ProcessInfo:
     def __init__(self, exeName: str, pid: int, ppid: int = -1, exePath: str = '', cmdLine: str = ''):
         self.pid = pid
-        self.ppid = ppid        # ppid is -1 if failed
-        self.exeName = exeName  # such as explorer.exe
-        self.is64Bit = None     # True if is 64 bit, False if 32 bit, None if failed
-        self.exePath = exePath  # such as C:\Windows\explorer.exe, empty if failed
-        self.cmdLine = cmdLine  # empty if failed
+        self.ppid = ppid                              
+        self.exeName = exeName                        
+        self.is64Bit = None                                                         
+        self.exePath = exePath                                                    
+        self.cmdLine = cmdLine                   
 
     def __str__(self):
         return "ProcessInfo(pid={}, ppid={}, exeName='{}', is64Bit={}, exePath='{}', cmdLine='{}'".format(
@@ -1452,7 +1452,7 @@ def GetProcesses(detailedInfo: bool = True) -> List[ProcessInfo]:
             IsWow64Process = ctypes.windll.kernel32.IsWow64Process
         except Exception:
             IsWow64Process = None
-    hSnapshot = ctypes.windll.kernel32.CreateToolhelp32Snapshot(15, 0)  # TH32CS_SNAPALL = 15
+    hSnapshot = ctypes.windll.kernel32.CreateToolhelp32Snapshot(15, 0)                       
     processEntry32 = tagPROCESSENTRY32()
     processEntry32.dwSize = ctypes.sizeof(processEntry32)
     processList = []
@@ -1461,13 +1461,13 @@ def GetProcesses(detailedInfo: bool = True) -> List[ProcessInfo]:
     while processNext:
         pinfo = ProcessInfo(processEntry32.szExeFile, processEntry32.th32ProcessID)
         if detailedInfo:
-            #PROCESS_QUERY_INFORMATION=0x0400, PROCESS_QUERY_LIMITED_INFORMATION=0x1000, PROCESS_VM_READ=0x0010
+                                                                                                               
             queryType = (0x1000 if IsNT6orHigher else 0x0400) | 0x0010
             hProcess = ctypes.windll.kernel32.OpenProcess(queryType, 0, pinfo.pid)
             if hProcess:
                 hProcess = ctypes.c_void_p(hProcess)
                 processBasicInformationAddr = 0
-                processBasicInformation = (ctypes.c_size_t * 6)()#sizeof PROCESS_BASIC_INFORMATION
+                processBasicInformation = (ctypes.c_size_t * 6)()                                 
                 outLen = ctypes.c_ulong(0)
                 ctypes.windll.ntdll.NtQueryInformationProcess.restype = ctypes.c_uint32
                 if IsWow64Process:
@@ -1478,17 +1478,17 @@ def GetProcesses(detailedInfo: bool = True) -> List[ProcessInfo]:
                     pinfo.is64Bit = False
                 ntStatus = ctypes.windll.ntdll.NtQueryInformationProcess(
                     hProcess, processBasicInformationAddr, processBasicInformation, ctypes.sizeof(processBasicInformation), ctypes.byref(outLen))
-                if ntStatus == 0: #STATUS_SUCCESS=0
+                if ntStatus == 0:                  
                     pinfo.ppid = processBasicInformation[5]
                     pebBaseAddress = processBasicInformation[1]
                     if pebBaseAddress:
-                        pebSize = 712 if CurrentProcessIs64Bit else 472 #sizeof PEB
+                        pebSize = 712 if CurrentProcessIs64Bit else 472            
                         peb = (ctypes.c_size_t * (pebSize // cPointerSize))()
                         outLen.value = 0
                         isok = ctypes.windll.kernel32.ReadProcessMemory(hProcess, ctypes.c_void_p(pebBaseAddress), peb, pebSize, ctypes.byref(outLen))
                         if isok:
                             processParametersAddr = ctypes.c_void_p(peb[4])
-                            uppSize = 128 if CurrentProcessIs64Bit else 72 #sizeof RTL_USER_PROCESS_PARAMETERS
+                            uppSize = 128 if CurrentProcessIs64Bit else 72                                    
                             upp = (ctypes.c_ubyte * uppSize)()
                             outLen.value = 0
                             isok = ctypes.windll.kernel32.ReadProcessMemory(hProcess, processParametersAddr, upp, uppSize, ctypes.byref(outLen))
@@ -1508,21 +1508,21 @@ def GetProcesses(detailedInfo: bool = True) -> List[ProcessInfo]:
                 if not pinfo.exePath:
                     exePath = (ctypes.c_wchar * MAX_PATH)()
                     if IsNT6orHigher:
-                        win32PathFormat = 0 #nativeSystemPathFormat = 1
+                        win32PathFormat = 0                            
                         outLen.value = len(exePath)
                         isok = ctypes.windll.kernel32.QueryFullProcessImageNameW(hProcess, win32PathFormat, exePath, ctypes.byref(outLen))
                     else:
                         hModule = None
                         try:
-                            #strlen =
+                                     
                             ctypes.windll.psapi.GetModuleFileNameExW(hProcess, hModule, exePath, len(exePath))
                         except:
-                            #strlen =
+                                     
                             ctypes.windll.kernel32.GetModuleFileNameExW(hProcess, hModule, exePath, len(exePath))
-                        #exePath is nativeSystemPathFormat
-                        #strlen = ctypes.windll.psapi.GetProcessImageFileNameW(hProcess, exePath, len(exePath))
-                        #if exePath.value:
-                            #strlen = ctypes.windll.kernel32.QueryDosDeviceW(ctypes.c_wchar_p(exePath.value), exePath, len(exePath))
+                                                          
+                                                                                                               
+                                          
+                                                                                                                                    
                     pinfo.exePath = exePath.value
                 ctypes.windll.kernel32.CloseHandle(hProcess)
         processList.append(pinfo)
@@ -1532,7 +1532,7 @@ def GetProcesses(detailedInfo: bool = True) -> List[ProcessInfo]:
 
 
 def TerminateProcess(pid: int) -> bool:
-    hProcess = ctypes.windll.kernel32.OpenProcess(0x0001, 0, pid)  # PROCESS_TERMINATE=0x0001
+    hProcess = ctypes.windll.kernel32.OpenProcess(0x0001, 0, pid)                            
     if hProcess:
         hProcess = ctypes.c_void_p(hProcess)
         ret = ctypes.windll.kernel32.TerminateProcess(hProcess, -1)
@@ -1619,12 +1619,12 @@ def SetClipboardText(text: str) -> bool:
         if _OpenClipboard(0):
             ctypes.windll.user32.EmptyClipboard()
             textByteLen = (len(text) + 1) * 2
-            hClipboardData = ctypes.windll.kernel32.GlobalAlloc(0x2, textByteLen)  # GMEM_MOVEABLE
+            hClipboardData = ctypes.windll.kernel32.GlobalAlloc(0x2, textByteLen)                 
             hDestText = ctypes.windll.kernel32.GlobalLock(ctypes.c_void_p(hClipboardData))
             ctypes.cdll.msvcrt.wcsncpy(ctypes.c_wchar_p(hDestText), ctypes.c_wchar_p(text), ctypes.c_size_t(textByteLen // 2))
             ctypes.windll.kernel32.GlobalUnlock(ctypes.c_void_p(hClipboardData))
-            # system owns hClipboardData after calling SetClipboardData,
-            # application can not write to or free the data once ownership has been transferred to the system
+                                                                        
+                                                                                                             
             if ctypes.windll.user32.SetClipboardData(ctypes.c_uint(ClipboardFormat.CF_UNICODETEXT), ctypes.c_void_p(hClipboardData)):
                 ret = True
             else:
@@ -1675,12 +1675,12 @@ def SetClipboardHtml(htmlText: str) -> bool:
     with _ClipboardLock:
         if _OpenClipboard(0):
             ctypes.windll.user32.EmptyClipboard()
-            hClipboardData = ctypes.windll.kernel32.GlobalAlloc(0x2002, len(u8Result) + 4)  # GMEM_MOVEABLE |GMEM_DDESHARE
+            hClipboardData = ctypes.windll.kernel32.GlobalAlloc(0x2002, len(u8Result) + 4)                                
             hDestText = ctypes.windll.kernel32.GlobalLock(ctypes.c_void_p(hClipboardData))
             ctypes.cdll.msvcrt.strncpy(ctypes.c_char_p(hDestText), ctypes.c_char_p(u8Result), len(u8Result))
             ctypes.windll.kernel32.GlobalUnlock(ctypes.c_void_p(hClipboardData))
-            # system owns hClipboardData after calling SetClipboardData,
-            # application can not write to or free the data once ownership has been transferred to the system
+                                                                        
+                                                                                                             
             if ctypes.windll.user32.SetClipboardData(ctypes.c_uint(ClipboardFormat.CF_HTML), ctypes.c_void_p(hClipboardData)):
                 ret = True
             else:
@@ -1769,24 +1769,24 @@ class ClipboardFormat:
     CF_HTML = ctypes.windll.user32.RegisterClipboardFormatW("HTML Format")
 
 
-# TODO: Failed to parse structure ACCESSTIMEOUT
+                                               
 class ExtendedProperty(ctypes.Structure):
     _fields_ = [
         ('PropertyName', ctypes.c_wchar_p),
         ('PropertyValue', ctypes.c_wchar_p),
     ]
 
-# TODO: Failed to parse structure FILTERKEYS
-# TODO: Failed to parse structure HIGHCONTRASTA
-# TODO: Failed to parse structure HIGHCONTRASTW
-# TODO: Failed to parse structure MOUSEKEYS
-# TODO: Failed to parse structure MSAAMENUINFO
-# TODO: Failed to parse structure SERIALKEYSA
-# TODO: Failed to parse structure SERIALKEYSW
-# TODO: Failed to parse structure SOUNDSENTRYA
-# TODO: Failed to parse structure SOUNDSENTRYW
-# TODO: Failed to parse structure STICKYKEYS
-# TODO: Failed to parse structure TOGGLEKEYS
+                                            
+                                               
+                                               
+                                           
+                                              
+                                             
+                                             
+                                              
+                                              
+                                            
+                                            
 class UIAutomationEventInfo(ctypes.Structure):
     _fields_ = [
         ('guid', ctypes.c_void_p),
@@ -2058,7 +2058,7 @@ def CreateCacheRequest() -> CacheRequest:
     """
     return CacheRequest()
 
-# Event Handling Implementations for core.py
+                                            
 
 def AddAutomationEventHandler(eventId: int, element, scope: int, cacheRequest, handler) -> None:
     """
@@ -2076,14 +2076,14 @@ def AddPropertyChangedEventHandler(element, scope: int, cacheRequest, handler, p
     """
     Registers a method that handles UI Automation property-changed events.
     """
-    # Convert propertyArray to a ctypes array if needed, but comtypes usually handles lists
-    # However, AddPropertyChangedEventHandler expects a pointer to an array of property IDs
-    # Let's see how generic we can be.
-    # The signature in IUIAutomation is: HRESULT AddPropertyChangedEventHandler(ptr_element, scope, ptr_cacheRequest, ptr_handler, ptr_propertyArray)
-    # The last arg is SAFEARRAY(int)
+                                                                                           
+                                                                                           
+                                      
+                                                                                                                                                     
+                                    
 
-    # We might need to manually convert list to SAFEARRAY or rely on comtypes.
-    # For now, let's pass a tuple/list and see if comtypes marshals it.
+                                                                              
+                                                                       
     _AutomationClient.instance().IUIAutomation.AddPropertyChangedEventHandler(element, scope, cacheRequest, handler, propertyArray)
 
 def RemovePropertyChangedEventHandler(element, handler) -> None:
@@ -2123,7 +2123,7 @@ def RemoveAllEventHandlers() -> None:
     _AutomationClient.instance().IUIAutomation.RemoveAllEventHandlers()
 
 
-# Condition creation helper functions
+                                     
 
 def CreateTrueCondition():
     """

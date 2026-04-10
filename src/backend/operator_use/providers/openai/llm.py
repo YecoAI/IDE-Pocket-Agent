@@ -25,31 +25,31 @@ class ChatOpenAI(BaseChatLLM):
     - Reasoning models (o1, o3, o4 series)
     """
 
-    # Available models with context windows (tokens)
-    # Source: https://platform.openai.com/docs/models
+                                                    
+                                                     
     MODELS = {
-        # GPT-5.4 series
-        "gpt-5.4": 1050000,          # GPT-5.4 flagship
-        "gpt-5.4-mini": 400000,      # GPT-5.4 Mini
-        "gpt-5.4-nano": 400000,      # GPT-5.4 Nano
-        # GPT-5.2 series
-        "gpt-5.2": 400000,           # GPT-5.2
-        # GPT-4.1 series
-        "gpt-4.1": 1000000,          # GPT-4.1
-        "gpt-4.1-mini": 1000000,     # GPT-4.1 Mini
-        "gpt-4.1-nano": 1000000,     # GPT-4.1 Nano
-        # GPT-4o series
-        "gpt-4o": 128000,            # GPT-4o
-        "gpt-4o-mini": 128000,       # GPT-4o Mini
-        # o-series (reasoning)
-        "o1": 200000,                # o1
-        "o3": 200000,                # o3
-        "o3-mini": 200000,           # o3 Mini
-        "o3-pro": 200000,            # o3 Pro
-        "o4-mini": 200000,           # o4 Mini
+                        
+        "gpt-5.4": 1050000,                            
+        "gpt-5.4-mini": 400000,                    
+        "gpt-5.4-nano": 400000,                    
+                        
+        "gpt-5.2": 400000,                    
+                        
+        "gpt-4.1": 1000000,                   
+        "gpt-4.1-mini": 1000000,                   
+        "gpt-4.1-nano": 1000000,                   
+                       
+        "gpt-4o": 128000,                    
+        "gpt-4o-mini": 128000,                    
+                              
+        "o1": 200000,                    
+        "o3": 200000,                    
+        "o3-mini": 200000,                    
+        "o3-pro": 200000,                    
+        "o4-mini": 200000,                    
     }
 
-    # Models that support chain-of-thought reasoning
+                                                    
     REASONING_PATTERNS = ("o1", "o3", "o4")
 
     def __init__(
@@ -128,16 +128,16 @@ class ChatOpenAI(BaseChatLLM):
                     })
                 openai_messages.append({"role": "user", "content": content_list})
             elif isinstance(msg, AIMessage):
-                # Handle AIMessage with potential thinking content
+                                                                  
                 content = msg.content
                 msg_dict: dict = {"role": "assistant", "content": content}
-                # For o1/o3/o4 models, pass reasoning_content so the model can continue its
-                # reasoning chain in multi-turn conversations (especially with tool calls).
+                                                                                           
+                                                                                           
                 if self._is_reasoning_model() and getattr(msg, "thinking", None):
                     msg_dict["reasoning_content"] = msg.thinking
                 openai_messages.append(msg_dict)
             elif isinstance(msg, ToolMessage):
-                # Reconstruct the tool call and the result for history consistency
+                                                                                  
                 tool_call = {
                     "id": msg.id,
                     "type": "function",
@@ -178,7 +178,7 @@ class ChatOpenAI(BaseChatLLM):
         message = choice.message
         usage_data = response.usage
 
-        # Capture reasoning tokens if available (o1 models)
+                                                           
         thinking_tokens = None
         if hasattr(usage_data, "completion_tokens_details") and usage_data.completion_tokens_details:
             thinking_tokens = getattr(
@@ -196,7 +196,7 @@ class ChatOpenAI(BaseChatLLM):
             thinking_tokens=thinking_tokens,
         )
 
-        # Extract thinking/reasoning content (for o1 models)
+                                                            
         thinking = None
         if self._is_reasoning_model():
             if hasattr(message, "reasoning_content"):
@@ -237,16 +237,16 @@ class ChatOpenAI(BaseChatLLM):
             **self.kwargs
         }
 
-        # Only add tools if they exist
+                                      
         if openai_tools:
             params["tools"] = openai_tools
 
-        # Temperature handling - o1 models don't support temperature
+                                                                    
         if self.temperature is not None and not self._is_reasoning_model():
             params["temperature"] = self.temperature
 
         if structured_output:
-            # Use beta parse endpoint for structured outputs
+                                                            
             response = self.client.beta.chat.completions.parse(
                 **params,
                 response_format=structured_output,
@@ -353,7 +353,7 @@ class ChatOpenAI(BaseChatLLM):
 
         response = self.client.chat.completions.create(**params)
 
-        # Accumulators for streamed tool calls
+                                              
         tool_call_id = None
         tool_call_name = None
         tool_call_args = ""
@@ -365,7 +365,7 @@ class ChatOpenAI(BaseChatLLM):
 
         for chunk in response:
             if not chunk.choices:
-                # Final chunk with usage
+                                        
                 if chunk.usage:
                     thinking_tokens = None
                     if hasattr(chunk.usage, "completion_tokens_details") and chunk.usage.completion_tokens_details:
@@ -400,7 +400,7 @@ class ChatOpenAI(BaseChatLLM):
                     yield LLMStreamEvent(type=LLMStreamEventType.TEXT_START)
                 yield LLMStreamEvent(type=LLMStreamEventType.TEXT_DELTA, content=delta.content)
 
-            # Accumulate tool call deltas
+                                         
             if hasattr(delta, 'tool_calls') and delta.tool_calls:
                 tc_delta = delta.tool_calls[0]
                 if tc_delta.id:
@@ -415,7 +415,7 @@ class ChatOpenAI(BaseChatLLM):
         if think_started:
             yield LLMStreamEvent(type=LLMStreamEventType.THINK_END)
 
-        # Yield accumulated tool call as final response (mutually exclusive with TEXT_END)
+                                                                                          
         if tool_call_id and tool_call_name:
             try:
                 tool_params = json.loads(tool_call_args)
@@ -461,7 +461,7 @@ class ChatOpenAI(BaseChatLLM):
 
         response = await self.aclient.chat.completions.create(**params)
 
-        # Accumulators for streamed tool calls
+                                              
         tool_call_id = None
         tool_call_name = None
         tool_call_args = ""
@@ -472,7 +472,7 @@ class ChatOpenAI(BaseChatLLM):
 
         async for chunk in response:
             if not chunk.choices:
-                # Final chunk with usage
+                                        
                 if chunk.usage:
                     thinking_tokens = None
                     if hasattr(chunk.usage, "completion_tokens_details") and chunk.usage.completion_tokens_details:
@@ -507,7 +507,7 @@ class ChatOpenAI(BaseChatLLM):
                     yield LLMStreamEvent(type=LLMStreamEventType.TEXT_START)
                 yield LLMStreamEvent(type=LLMStreamEventType.TEXT_DELTA, content=delta.content)
 
-            # Accumulate tool call deltas
+                                         
             if hasattr(delta, 'tool_calls') and delta.tool_calls:
                 tc_delta = delta.tool_calls[0]
                 if tc_delta.id:
@@ -522,7 +522,7 @@ class ChatOpenAI(BaseChatLLM):
         if think_started:
             yield LLMStreamEvent(type=LLMStreamEventType.THINK_END)
 
-        # Yield accumulated tool call as final response (mutually exclusive with TEXT_END)
+                                                                                          
         if tool_call_id and tool_call_name:
             try:
                 tool_params = json.loads(tool_call_args)
