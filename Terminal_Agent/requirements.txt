@@ -1,0 +1,13 @@
+httpx
+websockets
+mss
+Pillow
+pynput
+pydantic-settings
+customtkinter
+pystray
+darkdetect
+keyring
+yecoai-security-layer
+pywin32; sys_platform == 'win32'
+-e ../shared

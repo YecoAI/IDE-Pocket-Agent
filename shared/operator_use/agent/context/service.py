@@ -1,0 +1,226 @@
+import operator_use
+from datetime import datetime
+from enum import Enum
+from getpass import getuser
+from pathlib import Path
+from platform import machine, system, python_version
+
+from operator_use.messages import BaseMessage, SystemMessage, HumanMessage, AIMessage, ImageMessage
+
+BOOTSTRAP_FILENAMES = ["RULES.md", "SOUL.md", "USER.md", "CODE.md", "AGENTS.md"]
+
+class PromptMode(str, Enum):
+ FULL = "full"
+ MINIMAL = "minimal"
+ NONE = "none"
+
+class Context:
+ def __init__(self, workspace: Path, mcp_servers: dict | None = None):
+ self.workspace = workspace
+ self.codebase = Path(operator_use.__file__).resolve().parent.parent
+ self.mcp_servers = mcp_servers or {}
+ from operator_use.paths import get_userdata_dir
+ self._plugin_prompt_sections: list[str] = []
+
+ def register_plugin_prompt(self, section: str) -> None:
+ self._plugin_prompt_sections.append(section)
+
+ def unregister_plugin_prompt(self, section: str) -> None:
+ self._plugin_prompt_sections = [s for s in self._plugin_prompt_sections if s != section]
+
+ def _build_runtime_context(self) -> str:
+ now = datetime.now().strftime("%Y-%m-%d %H:%M")
+ _sys = system()
+ os_name = "MacOS" if _sys == "Darwin" else _sys
+ runtime = f"{os_name} {machine()} Python {python_version()}"
+ username = getuser()
+ home = Path.home()
+ lines = []
+ lines.append(f"## Today's Date: {now}")
+ lines.append(f"## Username: {username}")
+ lines.append(f"## Runtime: {runtime}")
+ lines.append(f"## Home: {home.as_posix()}")
+ lines.append(f"## Downloads: {(home / 'Downloads').as_posix()}")
+ lines.append(f"## Desktop: {(home / 'Desktop').as_posix()}")
+ lines.append(f"## Documents: {(home / 'Documents').as_posix()}")
+ if _sys == "Windows":
+ lines.append("## Shell: Windows CMD / PowerShell. Use `dir` not `ls`, `del` not `rm`. Pass commands as plain strings without surrounding quotes.")
+ elif _sys == "Darwin":
+ lines.append("## Shell: macOS bash/zsh.")
+ else:
+ lines.append("## Shell: Linux bash.")
+ return "\n".join(lines)
+
+ def _build_codebase_context(self) -> str:
+ codebase_path = self.codebase.expanduser().resolve().as_posix()
+ workspace_path = self.workspace.expanduser().resolve().as_posix()
+ return f"Codebase Path: {codebase_path}\nWorkspace Path: {workspace_path}"
+
+ def _build_workspace_context(self) -> str:
+ workspace_path = self.workspace.expanduser().resolve().as_posix()
+ return f"Workspace Path: {workspace_path}"
+
+ def _load_bootstrap_files(self) -> list[str]:
+ parts = []
+ for filename in BOOTSTRAP_FILENAMES:
+ path = self.workspace / filename
+ if path.exists():
+ content = path.read_text(encoding="utf-8")
+ if not content:
+ continue
+ parts.append(content)
+ return parts
+
+ def _build_mcp_context(self) -> str | None:
+ if not self.mcp_servers:
+ return None
+
+ lines = ["## Available MCP Servers"]
+ lines.append("You can connect to external MCP servers to access additional tools and capabilities.")
+ lines.append("Use the `mcp(action=\"list\")` tool to see all configured servers and their connection status.")
+ lines.append("Use `mcp(action=\"connect\", server_name=\"...\")` to connect and load tools from a server.")
+ lines.append("\n### Configured MCP Servers:\n")
+
+ for name, config in self.mcp_servers.items():
+ transport = config.get("transport", "unknown")
+ if transport == "stdio":
+ cmd = config.get("command", "?")
+ args = config.get("args", [])
+ args_str = f" {' '.join(args)}" if args else ""
+ lines.append(f"- **{name}** (stdio): `{cmd}{args_str}`")
+ elif transport in("http", "sse"):
+ url = config.get("url", "?")
+ lines.append(f"- **{name}** ({transport}): `{url}`")
+ else:
+ lines.append(f"- **{name}** ({transport})")
+
+ lines.append("\nTo use an MCP server's tools:")
+ lines.append("1. Call `mcp(action=\"connect\", server_name=\"<server-name>\")`")
+ lines.append("2. The server's tools will be loaded and available for use")
+ lines.append("3. Call `mcp(action=\"disconnect\", server_name=\"<server-name>\")` when done")
+
+ return "\n".join(lines)
+
+ def get_respond_behavior(self, is_voice: bool = False) -> str:
+ parts = ["## Respond Behavior"]
+ base = "Respond naturally and concisely."
+ voice = "Respond as if you are speaking."
+ parts.append(voice if is_voice else base + "\n- NEVER include message IDs like[bot_msg_id:N] or[msg_id:N] in your response. These are for your reference only.")
+ return "\n".join(parts)
+
+ def build_system_prompt(
+ self,
+ is_voice: bool = False,
+ prompt_mode: PromptMode = PromptMode.FULL,
+ system_prompt: str | None = None,
+) -> str:
+ if prompt_mode == PromptMode.NONE:
+ if self._plugin_prompt_sections:
+ parts = list(self._plugin_prompt_sections)
+ if system_prompt:
+ parts.append(f"## Instructions\n\n{system_prompt}")
+ return "\n\n".join(parts)
+ parts = [
+ "You are a subagent. Complete the delegated task and return your findings clearly. "
+ "Do not send messages to the user — your response is relayed by the delegating agent."
+]
+ if system_prompt:
+ parts.append(system_prompt)
+ return "\n\n".join(parts)
+
+ parts = []
+ parts.append(self.get_identity())
+
+ if system_prompt:
+ parts.append(f"## Instructions\n\n{system_prompt}")
+
+ if prompt_mode == PromptMode.FULL:
+ if bootstrap_parts:= self._load_bootstrap_files():
+ parts.extend(bootstrap_parts)
+
+ if mcp_context:= self._build_mcp_context():
+ parts.append(mcp_context)
+
+ if self._plugin_prompt_sections:
+ parts.extend(self._plugin_prompt_sections)
+
+ if prompt_mode == PromptMode.FULL:
+ parts.append(self.get_respond_behavior(is_voice=is_voice))
+
+ return "\n".join(parts)
+
+ def get_identity(self) -> str:
+ runtime_context = self._build_runtime_context()
+ codebase_context = self._build_codebase_context()
+ workspace_context = self._build_workspace_context()
+ return f"{runtime_context}\n\n{codebase_context}\n\n{workspace_context}"
+
+ def _hydrate_history(self, history: list[BaseMessage]) -> list[BaseMessage]:
+ last_image_idx = -1
+ for i, msg in enumerate(history):
+ if isinstance(msg, ImageMessage):
+ last_image_idx = i
+
+ hydrated = []
+ for i, msg in enumerate(history):
+ if isinstance(msg, ImageMessage) and i != last_image_idx:
+ paths = msg.metadata.get("image_paths") or[]
+ if paths:
+ path_str = ", ".join(paths)
+ ref = f"[{len(paths)} image(s): {path_str}]"
+ else:
+ n = len(msg.images) if msg.images else 1
+ ref = f"[{n} image(s) — data no longer available]"
+ text = f"{ref} {msg.content}".strip()
+ msg_id = msg.metadata.get("message_id")
+ if msg_id is not None:
+ text = f"[msg_id:{msg_id}] {text}"
+ hydrated.append(HumanMessage(content=text, metadata=msg.metadata))
+ continue
+
+ if isinstance(msg, (HumanMessage, ImageMessage)) and msg.metadata:
+ msg_id = msg.metadata.get("message_id")
+ if msg_id is not None:
+ hydrated.append(HumanMessage(
+ content=f"[msg_id:{msg_id}] {msg.content}",
+ metadata=msg.metadata,
+))
+ continue
+ elif isinstance(msg, AIMessage) and msg.metadata.get("message_id") is not None:
+ bot_msg_id = msg.metadata["message_id"]
+ reactions = msg.metadata.get("reactions", [])
+ reaction_str = ""
+ if reactions:
+ counts: dict[str, int] = {}
+ for r in reactions:
+ for e in r.get("emojis", []):
+ counts[e] = counts.get(e, 0) + 1
+ reaction_str = " reactions:" + ", ".join(
+ f"{e}({c})" if c > 1 else e for e, c in counts.items()
+)
+ hydrated.append(AIMessage(
+ content=f"[bot_msg_id:{bot_msg_id}{reaction_str}] {msg.content or ''}",
+ thinking=msg.thinking,
+ thinking_signature=msg.thinking_signature,
+ usage=msg.usage,
+ metadata=msg.metadata,
+))
+ continue
+ hydrated.append(msg)
+ return hydrated
+
+ async def build_messages(
+ self,
+ history: list[BaseMessage],
+ is_voice: bool = False,
+ session_id: str | None = None,
+ prompt_mode: PromptMode = PromptMode.FULL,
+ system_prompt: str | None = None,
+) -> list[BaseMessage]:
+ messages = [SystemMessage(content=self.build_system_prompt(
+ is_voice=is_voice,
+ prompt_mode=prompt_mode,
+ system_prompt=system_prompt,
+))]
+ messages.extend(self._hydrate_history(history))
+ return messages

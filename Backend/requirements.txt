@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+httpx
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+websockets
+openai
+anthropic
+sqlalchemy
+aiosqlite
+pyotp
+python-dotenv
+yecoai-security-layer
+-e ../shared
+pytest
+pytest-asyncio

@@ -1,0 +1,78 @@
+name: Build Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*' # Esegui quando viene pushato un tag come v1.0.0
+  workflow_dispatch: # Permette di avviare la build manualmente da GitHub
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build macOS App
+        run: |
+          pyinstaller --noconfirm --windowed \
+            --icon "IDE_Pocket.png" \
+            --name "IDE-Pocket-Agent" \
+            --add-data "IDE_Pocket.png:." \
+            --add-data "src:src" \
+            --hidden-import="customtkinter" \
+            --hidden-import="pystray" \
+            --hidden-import="PIL.Image" \
+            --hidden-import="pynput.mouse" \
+            --hidden-import="pynput.keyboard" \
+            --hidden-import="mss" \
+            --hidden-import="keyring" \
+            main.py
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: IDE-Pocket-Agent-macOS
+          path: dist/IDE-Pocket-Agent.app
+
+  create-release:
+    needs: [build-macos]
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download macOS Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: IDE-Pocket-Agent-macOS
+          path: release-assets/IDE-Pocket-Agent.app
+
+      - name: Zip macOS App
+        run: |
+          cd release-assets
+          zip -r IDE-Pocket-Agent-macOS.zip IDE-Pocket-Agent.app
+          rm -rf IDE-Pocket-Agent.app
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            release-assets/IDE-Pocket-Agent-macOS.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
